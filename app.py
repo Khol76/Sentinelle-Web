@@ -6,6 +6,9 @@ from flask import Flask, redirect, render_template, request, session, url_for
 from urllib.parse import urlparse
 import ipaddress
 import os
+import extentions
+import marque
+import suffixe
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
@@ -15,6 +18,7 @@ app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
 # officiel, c'est un signal classique d'hameçonnage (ex. « paypa1.com »,
 # « desjardins-securite.com »).
 
+<<<<<<< HEAD
 MARQUES =
 
 
@@ -26,4 +30,6 @@ MARQUES =
 # avant de comparer, pour attraper les imitations déguisées.
 TRADUCTION_LEET = str.maketrans({"0": "o", "1": "l", "3": "e", "4": "a",
                                  "5": "s", "7": "t", "$": "s"})
+=======
+>>>>>>> 0e6f12a0db4bac0a9e294e28891391c0328eb744
 
