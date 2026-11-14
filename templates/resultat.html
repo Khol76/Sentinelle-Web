@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Résultat — Sentinelle Web</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; }
+        .score { font-size: 40px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Résultat de l'analyse</h1>
+    <p>Adresse analysée : <strong>{{ url }}</strong></p>
+    <div class="score">{{ score }} / 100</div>
+    <h2>Détails</h2>
+    <ul>
+        {% for raison in raisons %}
+        <li>{{ raison }}</li>
+        {% endfor %}
+    </ul>
+    <p><a href="/">← Analyser une autre adresse</a></p>
+    <!-- Jour J : ajoutez ici le verdict coloré (voir le projet d'entraînement) -->
+</body>
+</html>
