@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from urllib.parse import urlparse
 
 import requests
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, session, redirect, url_for
 
 from chargement import charger_liste, charger_marques
 # ---------------------------------------------------------------------------
@@ -138,7 +138,7 @@ def verdict_pour(score):
 # Route 1 : la page d'accueil, qui affiche le formulaire
 @app.route("/")
 def accueil():
-    return render_template("index.html")
+    return render_template("index1.html")
 
 
 # Route 2 : reçoit le formulaire (méthode POST) et affiche le résultat
