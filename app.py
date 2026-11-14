@@ -12,8 +12,6 @@ import requests
 from flask import Flask, jsonify, render_template, request
 
 from chargement import charger_liste, charger_marques
-
-
 # ---------------------------------------------------------------------------
 # 1. LISTES DE RÉFÉRENCE
 #    Elles sont maintenant dans le dossier « donnees/ ».
