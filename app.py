@@ -45,6 +45,3 @@ app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
 # avant de comparer, pour attraper les imitations déguisées.
 TRADUCTION_LEET = str.maketrans({"0": "o", "1": "l", "3": "e", "4": "a",
                                  "5": "s", "7": "t", "$": "s"})
-=======
->>>>>>> 0e6f12a0db4bac0a9e294e28891391c0328eb744
-
