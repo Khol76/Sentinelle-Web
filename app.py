@@ -36,16 +36,11 @@ app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
 
 
 
-
-
-
 # Les fraudeurs remplacent souvent des lettres par des chiffres
 # (paypa1, faceb00k, g00gle). On « traduit » ces chiffres en lettres
 # avant de comparer, pour attraper les imitations déguisées.
 TRADUCTION_LEET = str.maketrans({"0": "o", "1": "l", "3": "e", "4": "a",
                                  "5": "s", "7": "t", "$": "s"})
-<<<<<<< HEAD
-
 
 
 def domaine_est_officiel(domaine, officiels):
@@ -60,7 +55,7 @@ def domaine_est_officiel(domaine, officiels):
 def marque_imitee(domaine):
     """Retourne le nom de la marque imitée, ou None si tout est beau."""
     domaine_traduit = domaine.translate(TRADUCTION_LEET)
-    for marque, officiels in marque.items():
+    for marque, officiels in MARQUES.items():
         if marque in domaine_traduit and not domaine_est_officiel(domaine, officiels):
             return marque
     return None
@@ -78,10 +73,58 @@ def analyser_url(url):
     morceaux = urlparse(url_analysee)
     domaine = morceaux.hostname or ""  # ex. "www.paypa1.com" (sans le chemin)
 
+    # Règle 1 — pas de HTTPS : la connexion n'est pas chiffrée
+    if morceaux.scheme != "https":
+        score -= 30
+        raisons.append("Le site n'utilise pas HTTPS : la connexion n'est pas chiffrée.")
 
+    # Règle 2 — présence d'un « @ » : tout ce qui précède le @ est ignoré
+    # par le navigateur, une technique classique d'hameçonnage
+    # (ex. http://banque-legitime.com@site-pirate.ru)
+    if "@" in url:
+        score -= 30
+        raisons.append("L'adresse contient un « @ » : le vrai site est celui après le @, pas celui affiché avant.")
 
- """a mettre ici les règles"""
+    # Règle 3 — URL très longue : souvent utilisée pour noyer le vrai domaine
+    if len(url) > 75:
+        score -= 20
+        raisons.append(
+            "L'adresse est très longue (" + str(len(url)) + " caractères) : fréquent dans les liens d'hameçonnage.")
 
+    # Règle 4 — domaine qui imite une marque connue (NOUVEAU)
+    marque = marque_imitee(domaine)
+    if marque:
+        score -= 25
+        raisons.append("Le domaine imite la marque « " + marque + " » sans être son site officiel : "
+                                                                  "une adresse comme « " + domaine + " » cherche à te faire croire que tu es sur le vrai site.")
+
+    # Règle 5 — nombre inhabituel de sous-domaines (NOUVEAU)
+    # Un domaine normal a 2 ou 3 morceaux séparés par des points
+    # (ex. google.com = 2, www.google.com = 3). Les fraudeurs empilent les
+    # sous-domaines pour cacher le vrai domaine à la fin de l'adresse.
+    morceaux_domaine = domaine.split(".") if domaine else []
+    if len(morceaux_domaine) >= 5:
+        score -= 20
+        raisons.append(
+            "L'adresse empile " + str(len(morceaux_domaine)) + " morceaux de domaine séparés par des points : "
+                                                               "empiler les sous-domaines sert souvent à cacher le vrai site, tout au bout de l'adresse.")
+
+    # Règle 6 — adresse IP au lieu d'un nom de domaine
+    hote = morceaux.hostname
+    if hote:
+        try:
+            ipaddress.ip_address(hote)  # réussit seulement si c'est une IP
+            score -= 25
+            raisons.append(
+                "L'adresse utilise une adresse IP (" + hote + ") au lieu d'un nom de domaine : les sites légitimes utilisent presque toujours un nom de domaine.")
+        except ValueError:
+            pass  # ce n'est pas une IP : rien à signaler pour cette règle
+
+    if not raisons:
+        raisons.append(
+            "Aucun signal de risque détecté par nos règles de base. Reste vigilant : ça ne garantit pas que le site est légitime.")
+
+    return max(score, 0), raisons
 
 
 def verdict_pour(score):
@@ -125,5 +168,3 @@ def effacer_historique():
 # Point d'entrée : « python app.py » démarre le serveur de développement
 if __name__ == "__main__":
     app.run(debug=True)
-=======
->>>>>>> 43cb6a6be27658e37c5812259b8f61d855121fad
