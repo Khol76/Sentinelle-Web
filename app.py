@@ -6,6 +6,10 @@ from flask import Flask, redirect, render_template, request, session, url_for
 from urllib.parse import urlparse
 import ipaddress
 import os
+<<<<<<< HEAD
+=======
+import marque
+>>>>>>> d5f14f56d307e545374dcbad659134ec904b190f
 
 
 app = Flask(__name__)
