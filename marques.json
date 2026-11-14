@@ -1,0 +1,280 @@
+{
+  "Banques et paiements": {
+    "desjardins": [
+      "desjardins.com"
+    ],
+    "banquenationale": [
+      "bnc.ca"
+    ],
+    "rbc": [
+      "rbc.com",
+      "rbcroyalbank.com"
+    ],
+    "bmo": [
+      "bmo.com"
+    ],
+    "tdbank": [
+      "td.com",
+      "tdbank.com"
+    ],
+    "scotiabank": [
+      "scotiabank.com"
+    ],
+    "cibc": [
+      "cibc.com"
+    ],
+    "tangerine": [
+      "tangerine.ca"
+    ],
+    "simplii": [
+      "simplii.com"
+    ],
+    "wealthsimple": [
+      "wealthsimple.com"
+    ],
+    "koho": [
+      "koho.ca"
+    ],
+    "interac": [
+      "interac.ca"
+    ],
+    "paypal": [
+      "paypal.com",
+      "paypal.ca"
+    ],
+    "mastercard": [
+      "mastercard.com",
+      "mastercard.ca"
+    ],
+    "americanexpress": [
+      "americanexpress.com"
+    ],
+    "coinbase": [
+      "coinbase.com"
+    ],
+    "binance": [
+      "binance.com"
+    ]
+  },
+  "Gouvernement et services publics (Québec)": {
+    "revenuquebec": [
+      "revenuquebec.ca"
+    ],
+    "saaq": [
+      "saaq.gouv.qc.ca"
+    ],
+    "ramq": [
+      "ramq.gouv.qc.ca"
+    ],
+    "hydroquebec": [
+      "hydroquebec.com"
+    ],
+    "lotoquebec": [
+      "lotoquebec.com"
+    ]
+  },
+  "Livraison": {
+    "postescanada": [
+      "postescanada.ca",
+      "canadapost.ca",
+      "canadapost-postescanada.ca"
+    ],
+    "canadapost": [
+      "canadapost.ca",
+      "postescanada.ca",
+      "canadapost-postescanada.ca"
+    ],
+    "purolator": [
+      "purolator.com"
+    ],
+    "fedex": [
+      "fedex.com"
+    ],
+    "intelcom": [
+      "intelcom.ca"
+    ]
+  },
+  "Télécoms": {
+    "videotron": [
+      "videotron.com"
+    ],
+    "bell": [
+      "bell.ca"
+    ],
+    "rogers": [
+      "rogers.com"
+    ],
+    "fizz": [
+      "fizz.ca"
+    ],
+    "telus": [
+      "telus.com"
+    ],
+    "koodo": [
+      "koodomobile.com"
+    ],
+    "virginplus": [
+      "virginplus.ca"
+    ],
+    "freedommobile": [
+      "freedommobile.ca"
+    ],
+    "cogeco": [
+      "cogeco.ca"
+    ]
+  },
+  "Magasins en ligne": {
+    "amazon": [
+      "amazon.com",
+      "amazon.ca"
+    ],
+    "costco": [
+      "costco.ca",
+      "costco.com"
+    ],
+    "walmart": [
+      "walmart.ca",
+      "walmart.com"
+    ],
+    "ebay": [
+      "ebay.com",
+      "ebay.ca"
+    ],
+    "aliexpress": [
+      "aliexpress.com"
+    ],
+    "temu": [
+      "temu.com"
+    ],
+    "shein": [
+      "shein.com"
+    ],
+    "bestbuy": [
+      "bestbuy.ca",
+      "bestbuy.com"
+    ],
+    "canadiantire": [
+      "canadiantire.ca"
+    ],
+    "ikea": [
+      "ikea.com"
+    ],
+    "sephora": [
+      "sephora.com",
+      "sephora.ca"
+    ],
+    "kijiji": [
+      "kijiji.ca"
+    ]
+  },
+  "Géants de la tech": {
+    "apple": [
+      "apple.com",
+      "icloud.com"
+    ],
+    "microsoft": [
+      "microsoft.com",
+      "live.com",
+      "outlook.com",
+      "office.com"
+    ],
+    "outlook": [
+      "outlook.com",
+      "live.com",
+      "office.com"
+    ],
+    "google": [
+      "google.com",
+      "google.ca",
+      "gmail.com"
+    ],
+    "yahoo": [
+      "yahoo.com"
+    ],
+    "adobe": [
+      "adobe.com"
+    ],
+    "dropbox": [
+      "dropbox.com"
+    ],
+    "docusign": [
+      "docusign.com",
+      "docusign.net"
+    ]
+  },
+  "Réseaux sociaux et messageries": {
+    "facebook": [
+      "facebook.com"
+    ],
+    "instagram": [
+      "instagram.com"
+    ],
+    "whatsapp": [
+      "whatsapp.com"
+    ],
+    "tiktok": [
+      "tiktok.com"
+    ],
+    "snapchat": [
+      "snapchat.com"
+    ],
+    "linkedin": [
+      "linkedin.com"
+    ],
+    "twitter": [
+      "twitter.com",
+      "x.com"
+    ],
+    "discord": [
+      "discord.com",
+      "discord.gg"
+    ]
+  },
+  "Divertissement": {
+    "netflix": [
+      "netflix.com"
+    ],
+    "disneyplus": [
+      "disneyplus.com"
+    ],
+    "spotify": [
+      "spotify.com"
+    ]
+  },
+  "Jeux vidéo": {
+    "steam": [
+      "steampowered.com",
+      "steamcommunity.com"
+    ],
+    "roblox": [
+      "roblox.com"
+    ],
+    "epicgames": [
+      "epicgames.com"
+    ],
+    "playstation": [
+      "playstation.com"
+    ],
+    "xbox": [
+      "xbox.com"
+    ]
+  },
+  "Voyage et services": {
+    "aircanada": [
+      "aircanada.com"
+    ],
+    "viarail": [
+      "viarail.ca"
+    ],
+    "uber": [
+      "uber.com"
+    ],
+    "doordash": [
+      "doordash.com"
+    ],
+    "airbnb": [
+      "airbnb.com",
+      "airbnb.ca"
+    ]
+  }
+}

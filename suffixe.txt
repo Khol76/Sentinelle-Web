@@ -1,4 +1,0 @@
-SUFFIXES_DOUBLES = [
-    "co.uk", "org.uk", "ac.uk", "com.au", "co.nz", "co.jp", "com.br",
-    "qc.ca", "on.ca", "gouv.qc.ca", "gc.ca", "com.mx", "co.za",
-]

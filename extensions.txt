@@ -1,5 +1,25 @@
-EXTENSIONS_SUSPECTES = [
-    "xyz", "top", "click", "link", "work", "zip", "mov", "country",
-    "gq", "tk", "ml", "cf", "ga", "rest", "fit", "loan", "win", "buzz",
-    "icu", "cyou", "sbs", "monster",
-]
+# Extensions de domaine souvent abusées (sans le point)
+# Une valeur par ligne. Les lignes qui commencent par # sont ignorées.
+
+xyz
+top
+click
+link
+work
+zip
+mov
+country
+gq
+tk
+ml
+cf
+ga
+rest
+fit
+loan
+win
+buzz
+icu
+cyou
+sbs
+monster

@@ -2,11 +2,29 @@
 # Une mini application Flask qui analyse une URL et lui donne un score de risque.
 
 
-from flask import Flask, redirect, render_template, request, session, url_for
-from urllib.parse import urlparse
 import ipaddress
 import os
-import marque
+import re
+from datetime import datetime, timezone
+from urllib.parse import urlparse
+
+import requests
+from flask import Flask, jsonify, render_template, request
+
+from chargement import charger_liste, charger_marques
+
+
+# ---------------------------------------------------------------------------
+# 1. LISTES DE RÉFÉRENCE
+#    Elles sont maintenant dans le dossier « donnees/ ».
+#    Pour ajouter une marque, un mot ou une extension, modifie ces fichiers.
+# ---------------------------------------------------------------------------
+
+MARQUES = charger_marques("marques.json")
+MOTS_SUSPECTS = charger_liste("mots_suspects.txt")
+EXTENSIONS_SUSPECTES = charger_liste("extensions.txt")
+RACCOURCISSEURS = charger_liste("raccourcisseurs.txt")
+SUFFIXES_DOUBLES = charger_liste("suffixes.txt")
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
@@ -26,6 +44,7 @@ app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
 # avant de comparer, pour attraper les imitations déguisées.
 TRADUCTION_LEET = str.maketrans({"0": "o", "1": "l", "3": "e", "4": "a",
                                  "5": "s", "7": "t", "$": "s"})
+<<<<<<< HEAD
 
 
 
@@ -106,3 +125,5 @@ def effacer_historique():
 # Point d'entrée : « python app.py » démarre le serveur de développement
 if __name__ == "__main__":
     app.run(debug=True)
+=======
+>>>>>>> 43cb6a6be27658e37c5812259b8f61d855121fad

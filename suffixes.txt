@@ -1,0 +1,16 @@
+# Suffixes de domaine en deux parties (pour trouver le vrai domaine)
+# Une valeur par ligne. Les lignes qui commencent par # sont ignorées.
+
+co.uk
+org.uk
+ac.uk
+com.au
+co.nz
+co.jp
+com.br
+qc.ca
+on.ca
+gouv.qc.ca
+gc.ca
+com.mx
+co.za
