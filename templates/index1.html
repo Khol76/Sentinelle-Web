@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LienSûr — Vérifiez un lien avant de cliquer</title>
+  <title>Sentinelle Web — Vérifiez un lien avant de cliquer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -286,6 +286,30 @@
       .zone-saisie { flex-direction: column; }
     }
 
+    /* ============ HISTORIQUE ============ */
+    .bloc-historique { margin-top: 32px; border-top: 1px solid var(--bordure); padding-top: 24px; }
+    .historique-entete { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 12px; }
+    .historique-entete h3 { font-size: 1.05rem; }
+    .btn-effacer {
+      font-family: inherit; font-size: .85rem; cursor: pointer;
+      background: none; border: 1px solid var(--bordure); color: var(--texte-doux);
+      padding: 6px 14px; border-radius: 999px; transition: all .2s;
+    }
+    .btn-effacer:hover { border-color: var(--rouge); color: var(--rouge); }
+    #historique { list-style: none; display: grid; gap: 8px; }
+    .ligne-historique {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 14px; border-radius: 12px; background: var(--fond);
+    }
+    .pastille-score {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      display: grid; place-items: center; font-weight: 800; font-size: .9rem; color: #fff;
+    }
+    .pastille-score.vert { background: var(--vert); }
+    .pastille-score.orange { background: var(--orange); }
+    .pastille-score.rouge { background: var(--rouge); }
+    .historique-url { flex: 1; font-size: .9rem; word-break: break-all; color: var(--texte); }
+
     /* ============ BOUTON DE LANGUE ============ */
     .langue {
       display: inline-flex; background: rgba(255,255,255,.08);
@@ -311,7 +335,7 @@
   <!-- ================= NAVIGATION ================= -->
   <nav>
     <div class="largeur">
-      <a href="#" class="logo"><div class="logo-icone">🛡️</div><div>Lien<span>Sûr</span></div></a>
+      <a href="#" class="logo"><div class="logo-icone">🛡️</div><div>Sentinelle<span>Web</span></div></a>
       <div class="menu">
         <a href="#comment" data-i18n="nav_comment">Comment ça marche</a>
         <a href="#verifications" data-i18n="nav_verifs">Vérifications</a>
@@ -331,7 +355,7 @@
       <div>
         <div class="pastille" data-i18n="hero_pastille">🔒 Gratuit · Sans inscription · Aucun lien ouvert</div>
         <h1 data-i18n-html="hero_titre">Un doute sur un lien&nbsp;?<br><span class="accent">Vérifiez avant de cliquer.</span></h1>
-        <p class="intro" data-i18n="hero_intro">Faux colis de Postes Canada, fausse alerte bancaire, remboursement de l'ARC… LienSûr analyse le lien en quelques secondes et vous explique clairement s'il est dangereux.</p>
+        <p class="intro" data-i18n="hero_intro">Faux colis de Postes Canada, fausse alerte bancaire, remboursement de l'ARC… Sentinelle Web analyse le lien en quelques secondes et vous explique clairement s'il est dangereux.</p>
         <div class="hero-boutons">
           <a href="#analyser" class="btn btn-principal" data-i18n="hero_btn1">Vérifier un lien maintenant →</a>
           <a href="#comment" class="btn btn-secondaire" data-i18n="hero_btn2">Comment ça marche</a>
@@ -397,6 +421,14 @@
         <div class="exemples" id="exemples"></div>
 
         <div id="resultats" aria-live="polite"></div>
+
+        <div id="bloc-historique" class="bloc-historique" hidden>
+          <div class="historique-entete">
+            <h3 data-i18n="hist_titre">🕘 Vos dernières analyses</h3>
+            <button type="button" id="btn-effacer" class="btn-effacer" data-i18n="hist_effacer">Effacer l'historique</button>
+          </div>
+          <ul id="historique"></ul>
+        </div>
       </div>
     </div>
   </section>
@@ -412,7 +444,7 @@
       <div class="etapes">
         <div class="carte"><div class="icone-ronde">📋</div><h3 data-i18n="cm1_t">1. Copiez le lien</h3><p data-i18n="cm1_p">Sans cliquer dessus : faites un appui long ou un clic droit, puis « Copier l'adresse du lien ».</p></div>
         <div class="carte"><div class="icone-ronde">🔎</div><h3 data-i18n="cm2_t">2. On l'analyse</h3><p data-i18n="cm2_p">Plus de 10 vérifications : imitation de marque, âge du domaine, mots piégés, extension douteuse…</p></div>
-        <div class="carte"><div class="icone-ronde">✅</div><h3 data-i18n="cm3_t">3. Vous décidez</h3><p data-i18n="cm3_p">Un score de 0 à 100, un verdict clair et l'explication de chaque signal d'alerte.</p></div>
+        <div class="carte"><div class="icone-ronde">✅</div><h3 data-i18n="cm3_t">3. Vous décidez</h3><p data-i18n="cm3_p">Un score de confiance de 0 à 100 (100 = sûr), un verdict clair et l'explication de chaque signal d'alerte.</p></div>
       </div>
     </div>
   </section>
@@ -422,7 +454,7 @@
     <div class="largeur">
       <div class="titre-section">
         <div class="sur-titre" data-i18n="vf_sur">Sous le capot</div>
-        <h2 data-i18n="vf_titre">Ce que LienSûr vérifie</h2>
+        <h2 data-i18n="vf_titre">Ce que Sentinelle Web vérifie</h2>
         <p data-i18n="vf_intro">Les mêmes signaux que les experts en sécurité regardent en premier.</p>
       </div>
       <div class="verifs">
@@ -458,7 +490,7 @@
   <!-- ================= PIED DE PAGE ================= -->
   <footer>
     <div class="largeur">
-      <div class="logo"><div class="logo-icone">🛡️</div><div>Lien<span>Sûr</span></div></div>
+      <div class="logo"><div class="logo-icone">🛡️</div><div>Sentinelle<span>Web</span></div></div>
       <p data-i18n="footer">Projet étudiant · Un score faible ne garantit pas qu'un site est sûr. En cas de doute, ne cliquez pas.</p>
     </div>
   </footer>
@@ -475,12 +507,12 @@
     // =====================================================================
     const TEXTES = {
       fr: {
-        titre_page: "LienSûr — Vérifiez un lien avant de cliquer",
+        titre_page: "Sentinelle Web — Vérifiez un lien avant de cliquer",
         nav_comment: "Comment ça marche", nav_verifs: "Vérifications", nav_conseils: "Conseils",
         nav_analyser: "Analyser un lien",
         hero_pastille: "🔒 Gratuit · Sans inscription · Aucun lien ouvert",
         hero_titre: 'Un doute sur un lien&nbsp;?<br><span class="accent">Vérifiez avant de cliquer.</span>',
-        hero_intro: "Faux colis de Postes Canada, fausse alerte bancaire, remboursement de l'ARC… LienSûr analyse le lien en quelques secondes et vous explique clairement s'il est dangereux.",
+        hero_intro: "Faux colis de Postes Canada, fausse alerte bancaire, remboursement de l'ARC… Sentinelle Web analyse le lien en quelques secondes et vous explique clairement s'il est dangereux.",
         hero_btn1: "Vérifier un lien maintenant →", hero_btn2: "Comment ça marche",
         stat1: "vérifications", stat2: "marques surveillées", stat3: "par analyse",
         verdict_vert: "Sûr", verdict_orange: "Suspect", verdict_rouge: "Dangereux",
@@ -501,7 +533,7 @@
         faux_texto: "Postes Canada : votre colis est en attente. Des frais de 1,99 $ sont requis : postescanada-frais.xyz/colis . Sinon il sera retourné. Info : https://www.canadapost.ca",
 
         signaux: "Signaux d'alerte", informations: "Informations", aucun_signal: "Aucun signal d'alerte détecté.",
-        risque: "risque /100", conseil: "💡 Conseil",
+        risque: "sur 100", conseil: "💡 Conseil",
         chargement: n => `Analyse de ${n} lien${n > 1 ? "s" : ""} en cours…`,
         aucun_lien: "Aucun lien trouvé dans ce message.",
         msg_rouge: "❌ Ce message contient au moins un lien dangereux.",
@@ -514,9 +546,9 @@
         cm_intro: "Trois étapes, aucune inscription. Le site n'ouvre jamais la page suspecte à votre place.",
         cm1_t: "1. Copiez le lien", cm1_p: "Sans cliquer dessus : faites un appui long ou un clic droit, puis « Copier l'adresse du lien ».",
         cm2_t: "2. On l'analyse", cm2_p: "Plus de 10 vérifications : imitation de marque, âge du domaine, mots piégés, extension douteuse…",
-        cm3_t: "3. Vous décidez", cm3_p: "Un score de 0 à 100, un verdict clair et l'explication de chaque signal d'alerte.",
+        cm3_t: "3. Vous décidez", cm3_p: "Un score de confiance de 0 à 100 (100 = sûr), un verdict clair et l'explication de chaque signal d'alerte.",
 
-        vf_sur: "Sous le capot", vf_titre: "Ce que LienSûr vérifie",
+        vf_sur: "Sous le capot", vf_titre: "Ce que Sentinelle Web vérifie",
         vf_intro: "Les mêmes signaux que les experts en sécurité regardent en premier.",
         vf1_t: "Imitation de marque", vf1_p: "« paypa1 », « desjardlns »… on repère les fausses copies de 75+ marques.",
         vf2_t: "Âge du domaine", vf2_p: "Un site créé il y a 3 jours qui se dit être votre banque ? Très suspect.",
@@ -533,6 +565,7 @@
         cs2_t: "Passez par l'appli officielle", cs2_p: "Au lieu de cliquer, ouvrez vous-même l'application de votre banque ou tapez l'adresse.",
         cs3_t: "Jamais de mot de passe par lien", cs3_p: "Aucune banque ni l'ARC ne vous demandera vos codes par texto ou courriel.",
         cs4_t: "Signalez la fraude", cs4_p: "Transférez les textos suspects au 7726 et signalez-les au Centre antifraude du Canada.",
+        hist_titre: "🕘 Vos dernières analyses", hist_effacer: "Effacer l'historique",
         footer: "Projet étudiant · Un score faible ne garantit pas qu'un site est sûr. En cas de doute, ne cliquez pas.",
 
         types: {
@@ -554,7 +587,7 @@
           court: {
             placeholder: "ex. https://bit.ly/3xYz12",
             exemples: ["https://bit.ly/3example", "https://tinyurl.com/example"],
-            conseil: "Un lien raccourci cache sa vraie destination. LienSûr la suit pour vous sans ouvrir la page. Si la destination ne correspond pas à ce qu'on vous a promis, n'y allez pas."
+            conseil: "Un lien raccourci cache sa vraie destination. Sentinelle Web la suit pour vous sans ouvrir la page. Si la destination ne correspond pas à ce qu'on vous a promis, n'y allez pas."
           },
           message: {
             placeholder: "", exemples: [],
@@ -564,12 +597,12 @@
       },
 
       en: {
-        titre_page: "LienSûr — Check a link before you click",
+        titre_page: "Sentinelle Web — Check a link before you click",
         nav_comment: "How it works", nav_verifs: "Checks", nav_conseils: "Tips",
         nav_analyser: "Check a link",
         hero_pastille: "🔒 Free · No sign-up · No link opened",
-        hero_titre: 'Suspicious about a link?<br><span class="accent">Check before you click.</span>',
-        hero_intro: "Fake Canada Post parcels, fake bank alerts, CRA refunds… LienSûr checks the link in seconds and clearly explains whether it's dangerous.",
+        hero_titre: 'Not sure about a link?<br><span class="accent">Check before you click.</span>',
+        hero_intro: "Fake Canada Post parcels, fake bank alerts, CRA refunds… Sentinelle Web checks the link in seconds and clearly explains whether it's dangerous.",
         hero_btn1: "Check a link now →", hero_btn2: "How it works",
         stat1: "checks", stat2: "brands monitored", stat3: "per check",
         verdict_vert: "Safe", verdict_orange: "Suspicious", verdict_rouge: "Dangerous",
@@ -590,7 +623,7 @@
         faux_texto: "Canada Post: your parcel is on hold. A $1.99 fee is required: canadapost-fees.xyz/parcel . Otherwise it will be returned. Info: https://www.canadapost.ca",
 
         signaux: "Warning signs", informations: "Information", aucun_signal: "No warning signs detected.",
-        risque: "risk /100", conseil: "💡 Tip",
+        risque: "out of 100", conseil: "💡 Tip",
         chargement: n => `Checking ${n} link${n > 1 ? "s" : ""}…`,
         aucun_lien: "No links found in this message.",
         msg_rouge: "❌ This message contains at least one dangerous link.",
@@ -603,9 +636,9 @@
         cm_intro: "Three steps, no sign-up. The site never opens the suspicious page for you.",
         cm1_t: "1. Copy the link", cm1_p: "Without clicking it: long-press or right-click, then \"Copy link address\".",
         cm2_t: "2. We check it", cm2_p: "More than 10 checks: brand imitation, domain age, trap words, shady extensions…",
-        cm3_t: "3. You decide", cm3_p: "A score from 0 to 100, a clear verdict and an explanation of every warning sign.",
+        cm3_t: "3. You decide", cm3_p: "A trust score from 0 to 100 (100 = safe), a clear verdict and an explanation of every warning sign.",
 
-        vf_sur: "Under the hood", vf_titre: "What LienSûr checks",
+        vf_sur: "Under the hood", vf_titre: "What Sentinelle Web checks",
         vf_intro: "The same signs security experts look at first.",
         vf1_t: "Brand imitation", vf1_p: "\"paypa1\", \"desjardlns\"… we spot fake copies of 75+ brands.",
         vf2_t: "Domain age", vf2_p: "A site created 3 days ago claiming to be your bank? Very suspicious.",
@@ -622,6 +655,7 @@
         cs2_t: "Use the official app", cs2_p: "Instead of clicking, open your bank's app yourself or type the address.",
         cs3_t: "Never a password via a link", cs3_p: "No bank and not the CRA will ask for your codes by text or email.",
         cs4_t: "Report fraud", cs4_p: "Forward suspicious texts to 7726 and report them to the Canadian Anti-Fraud Centre.",
+        hist_titre: "🕘 Your recent checks", hist_effacer: "Clear history",
         footer: "Student project · A low score doesn't guarantee a site is safe. When in doubt, don't click.",
 
         types: {
@@ -643,7 +677,7 @@
           court: {
             placeholder: "e.g. https://bit.ly/3xYz12",
             exemples: ["https://bit.ly/3example", "https://tinyurl.com/example"],
-            conseil: "A short link hides its real destination. LienSûr follows it for you without opening the page. If the destination doesn't match what you were promised, don't go there."
+            conseil: "A short link hides its real destination. Sentinelle Web follows it for you without opening the page. If the destination doesn't match what you were promised, don't go there."
           },
           message: {
             placeholder: "", exemples: [],
@@ -756,14 +790,43 @@
     }
 
     // ============ APPEL AU SERVEUR PYTHON ============
-    async function analyser(url) {
+    async function analyser(url, historique = true) {
       const reponse = await fetch(ADRESSE_SERVEUR + "/api/analyser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, langue })     // on envoie aussi la langue
+        credentials: "include",                       // garde la session (historique)
+        body: JSON.stringify({ url, langue, historique })
       });
       return reponse.json();
     }
+
+    // ============ HISTORIQUE (géré par Flask dans la session) ============
+    const zoneHistorique = document.getElementById("historique");
+
+    function afficherHistorique(liste) {
+      liste = Array.isArray(liste) ? liste : [];
+      document.getElementById("bloc-historique").hidden = liste.length === 0;
+      zoneHistorique.innerHTML = liste.map(h => `
+        <li class="ligne-historique">
+          <span class="pastille-score ${h.couleur}">${Number(h.score)}</span>
+          <span class="historique-url">${echapper(h.url)}</span>
+          <span class="etiquette ${h.couleur}">${echapper(h.verdict)}</span>
+        </li>`).join("");
+    }
+
+    async function chargerHistorique() {
+      try {
+        const r = await fetch(ADRESSE_SERVEUR + "/api/historique", { credentials: "include" });
+        afficherHistorique(await r.json());
+      } catch (e) { /* serveur absent : on n'affiche rien */ }
+    }
+
+    document.getElementById("btn-effacer").addEventListener("click", async () => {
+      try {
+        const r = await fetch(ADRESSE_SERVEUR + "/api/effacer-historique", { method: "POST", credentials: "include" });
+        afficherHistorique(await r.json());
+      } catch (e) {}
+    });
 
     // ============ AFFICHAGE D'UN RÉSULTAT ============
     function carteResultat(r, avecConseil) {
@@ -824,11 +887,13 @@
       resultats.innerHTML = `<div class="chargement"><div class="rond"></div>${T("chargement")(liens.length)}</div>`;
 
       try {
-        const reponses = await Promise.all(liens.map(analyser));
+        const reponses = await Promise.all(liens.map(l => analyser(l, type !== "message")));
+        if (type !== "message" && Array.isArray(reponses[0].historique)) afficherHistorique(reponses[0].historique);
         let html = "";
         if (type === "message") {
-          const pire = Math.max(...reponses.map(r => r.score || 0));
-          const couleur = pire >= 60 ? "rouge" : pire >= 30 ? "orange" : "vert";
+          // Le score de Sentinelle : 100 = sûr, 0 = très risqué. On garde le PIRE (le plus bas).
+          const pire = Math.min(...reponses.map(r => (typeof r.score === "number" ? r.score : 100)));
+          const couleur = pire < 50 ? "rouge" : pire < 80 ? "orange" : "vert";
           html += `<div class="resultat"><div class="resultat-entete ${couleur}"><div class="verdict ${couleur}" style="font-size:1.2rem">${T("msg_" + couleur)} (${T("liens_trouves")(liens.length)})</div></div></div>`;
           html += reponses.map(r => carteResultat(r, false)).join("");
           html += `<div class="conseil" style="margin:0"><strong>${T("conseil")}</strong>${echapper(T("types").message.conseil)}</div>`;
@@ -846,6 +911,7 @@
 
     // ============ DÉMARRAGE ============
     appliquerLangue(langue);
+    chargerHistorique();
   </script>
 </body>
 </html>
