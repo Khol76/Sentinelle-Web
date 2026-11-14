@@ -53,7 +53,7 @@ Le fichier `jeux-de-tests.md` détaille 6 adresses avec le score et le verdict a
 
 | Adresse | Score | Verdict |
 |---|---|---|
-| `https://www.google.com` | 100 | Probablement sûr |
+| `https://www.google.com` | 100 | Aucun signal majeur|
 | `http://banque-legitime.com@site-pirate.ru/connexion` | 40 | Risqué |
 | `https://www.paypa1.com/connexion` | 75 | Prudence |
 | `http://desjardins-securite.com` | 45 | Risqué |
