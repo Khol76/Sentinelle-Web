@@ -4,18 +4,26 @@ Mini application web en **Python + Flask** qui analyse une adresse web et lui at
 
 > ⚠️ L'analyse est purement textuelle : l'application ne visite jamais les liens analysés.
 
-## 🔍 Les 6 règles de détection
+## 🔍 Les 12 règles de détection
 
 | # | Règle | Pénalité |
 |---|-------|----------|
-| 1 | Pas de HTTPS — la connexion n'est pas chiffrée | −30 |
-| 2 | Présence d'un « @ » — tout ce qui le précède est ignoré par le navigateur | −30 |
-| 3 | Adresse très longue (> 75 caractères) | −20 |
-| 4 | Domaine imitant une marque connue (ex. `paypa1.com`) — avec traduction des chiffres en lettres (0→o, 1→l…) et vérification du domaine officiel, pour ne jamais pénaliser le vrai site | −25 |
-| 5 | Trop de sous-domaines (5 morceaux ou plus) — sert à cacher le vrai site tout au bout de l'adresse | −20 |
-| 6 | Adresse IP au lieu d'un nom de domaine (ex. `http://192.168.0.25/login`) | −25 |
+| 1 | Connexion non chiffrée (absence de HTTPS) | −10 |
+| 2 | Adresse IP au lieu d'un nom de domaine | −35 |
+| 3 | Lien très long (plus de 100 caractères) | −10 |
+| 4 | Imitation d'une marque connue ou faute de frappe | −40 |
+| 5 | Présence de « @ » dans l'adresse | −30 |
+| 6 | Extension suspecte | −20 |
+| 7 | Trois sous-domaines ou plus | −15 |
+| 8 | Plusieurs tirets dans le domaine principal | −15 |
+| 9 | Mots typiques des arnaques | −30 |
+| 10 | Caractères d'autres alphabets ou punycode | −35 |
+| 11 | Lien raccourci | −15 |
+| 12 | Domaine récemment enregistré (moins de 30 jours / moins de 180 jours) | −15 |
 
-**Verdicts :** 80–100 → *Probablement sûr* 🟢 · 50–79 → *Prudence* 🟠 · 0–49 → *Risqué* 🔴
+Le score commence à 100 et diminue lorsque des signaux suspects sont détectés. Un score élevé ne garantit pas qu'un site est légitime.
+
+**Verdicts :** 80–100 → *Aucun signal majeur* 🟢 · 50–79 → *Prudence* 🟠 · 0–49 → *Risqué* 🔴
 
 ## ✨ Fonctionnalités
 
@@ -53,12 +61,12 @@ Le fichier `jeux-de-tests.md` détaille 6 adresses avec le score et le verdict a
 
 | Adresse | Score | Verdict |
 |---|---|---|
-| `https://www.google.com` | 100 | Probablement sûr |
+| `https://www.google.com` | 100 | Aucun signal majeur|
 | `http://banque-legitime.com@site-pirate.ru/connexion` | 40 | Risqué |
 | `https://www.paypa1.com/connexion` | 75 | Prudence |
 | `http://desjardins-securite.com` | 45 | Risqué |
 | `https://connexion.banque.nationale.securite-verification.com/session/identifiant/client` | 60 | Prudence |
-| `https://www.paypal.com/signin` | 100 | Probablement sûr |
+| `https://www.paypal.com/signin` | 100 | Aucun signal majeur |
 
 ## 🗂️ Structure du projet
 
