@@ -15,7 +15,7 @@ Mini application web en **Python + Flask** qui analyse une adresse web et lui at
 | 5 | Trop de sous-domaines (5 morceaux ou plus) — sert à cacher le vrai site tout au bout de l'adresse | −20 |
 | 6 | Adresse IP au lieu d'un nom de domaine (ex. `http://192.168.0.25/login`) | −25 |
 
-**Verdicts :** 80–100 → *Probablement sûr* 🟢 · 50–79 → *Prudence* 🟠 · 0–49 → *Risqué* 🔴
+**Verdicts :** 80–100 → *Aucun signal majeur* 🟢 · 50–79 → *Prudence* 🟠 · 0–49 → *Risqué* 🔴
 
 ## ✨ Fonctionnalités
 
