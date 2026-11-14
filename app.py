@@ -6,9 +6,8 @@ from flask import Flask, redirect, render_template, request, session, url_for
 from urllib.parse import urlparse
 import ipaddress
 import os
-import extentions
 import marque
-import suffixe
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
