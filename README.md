@@ -16,7 +16,7 @@ Mini application web en **Python + Flask** qui analyse une adresse web et lui at
 | 6 | Extension suspecte | −20 |
 | 7 | Trois sous-domaines ou plus | −15 |
 | 8 | Plusieurs tirets dans le domaine principal | −15 |
-| 9 | Mots typiques des arnaques | Jusqu'à −30 |
+| 9 | Mots typiques des arnaques | −30 |
 | 10 | Caractères d'autres alphabets ou punycode | −35 |
 | 11 | Lien raccourci | −15 |
 | 12 | Domaine récemment enregistré (moins de 30 jours / moins de 180 jours) | −15 |
