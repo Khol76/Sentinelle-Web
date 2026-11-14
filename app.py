@@ -18,4 +18,4 @@ app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
 # officiel, c'est un signal classique d'hameçonnage (ex. « paypa1.com »,
 # « desjardins-securite.com »).
 
-MARQUES = 
+
