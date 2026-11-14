@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LienSûr — Vérifiez un lien avant de cliquer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ============ COULEURS ET BASES ============ */
+    :root {
+      --nuit: #0a1a33;          /* bleu nuit : sérieux, confiance */
+      --nuit-2: #11294f;
+      --bleu: #2563eb;
+      --emeraude: #10b981;      /* vert émeraude : sécurité */
+      --emeraude-fonce: #059669;
+      --fond: #f5f7fb;
+      --blanc: #ffffff;
+      --texte: #0f172a;
+      --texte-doux: #5b6b82;
+      --bordure: #e3e8f0;
+      --vert: #16a34a;
+      --orange: #f59e0b;
+      --rouge: #dc2626;
+      --ombre: 0 10px 30px rgba(10, 26, 51, .08);
+      --rayon: 18px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
+      background: var(--fond);
+      color: var(--texte);
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    .largeur { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    /* ============ BARRE DE NAVIGATION ============ */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(10, 26, 51, .85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    nav .largeur { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+    .logo { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 800; font-size: 1.3rem; }
+    .logo-icone {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--emeraude), var(--bleu));
+      display: grid; place-items: center; font-size: 1.1rem;
+    }
+    .logo span { color: var(--emeraude); }
+    .menu { display: flex; gap: 28px; align-items: center; }
+    .menu a { color: #c7d2e3; font-weight: 500; font-size: .95rem; transition: color .2s; }
+    .menu a:hover { color: #fff; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; border-radius: 12px; border: none;
+      font-family: inherit; font-weight: 600; font-size: 1rem;
+      cursor: pointer; transition: transform .15s, box-shadow .2s, background .2s;
+    }
+    .btn-principal { background: var(--emeraude); color: #fff; box-shadow: 0 6px 20px rgba(16,185,129,.35); }
+    .btn-principal:hover { background: var(--emeraude-fonce); transform: translateY(-2px); }
+    .btn-secondaire { background: rgba(255,255,255,.1); color: #fff; border: 1px solid rgba(255,255,255,.2); }
+    .btn-secondaire:hover { background: rgba(255,255,255,.18); }
+    .menu .btn { padding: 9px 18px; font-size: .9rem; color: #fff; }
+
+    /* ============ PRÉSENTATION (HERO) ============ */
+    .hero {
+      background:
+        radial-gradient(circle at 15% 20%, rgba(16,185,129,.25), transparent 40%),
+        radial-gradient(circle at 85% 30%, rgba(37,99,235,.35), transparent 45%),
+        linear-gradient(160deg, var(--nuit) 0%, var(--nuit-2) 100%);
+      color: #fff;
+      padding: 90px 0 140px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero .largeur { display: grid; grid-template-columns: 1.2fr 1fr; gap: 50px; align-items: center; }
+    .pastille {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(16,185,129,.15); color: #6ee7b7;
+      border: 1px solid rgba(16,185,129,.35);
+      padding: 6px 14px; border-radius: 999px; font-size: .85rem; font-weight: 600;
+      margin-bottom: 22px;
+    }
+    .hero h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 1.1; font-weight: 800; letter-spacing: -.02em; }
+    .hero h1 .accent {
+      background: linear-gradient(90deg, #34d399, #60a5fa);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero p.intro { color: #c7d2e3; font-size: 1.15rem; margin: 22px 0 32px; max-width: 520px; }
+    .hero-boutons { display: flex; gap: 14px; flex-wrap: wrap; }
+    .stats { display: flex; gap: 36px; margin-top: 44px; }
+    .stat strong { display: block; font-size: 1.6rem; font-weight: 800; color: #fff; }
+    .stat span { color: #94a3b8; font-size: .9rem; }
+
+    /* Carte d'illustration à droite */
+    .apercu {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 24px; padding: 24px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 30px 60px rgba(0,0,0,.3);
+    }
+    .apercu-ligne {
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,.95); color: var(--texte);
+      border-radius: 14px; padding: 14px 16px; margin-bottom: 12px;
+      animation: glisser .6s ease both;
+    }
+    .apercu-ligne:nth-child(2) { animation-delay: .15s; }
+    .apercu-ligne:nth-child(3) { animation-delay: .3s; }
+    .apercu-ligne:last-child { margin-bottom: 0; }
+    .apercu-ligne .domaine { flex: 1; font-weight: 600; font-size: .92rem; word-break: break-all; }
+    .etiquette { padding: 4px 10px; border-radius: 999px; font-size: .78rem; font-weight: 700; white-space: nowrap; }
+    .etiquette.vert { background: #dcfce7; color: #166534; }
+    .etiquette.orange { background: #fef3c7; color: #92400e; }
+    .etiquette.rouge { background: #fee2e2; color: #991b1b; }
+    @keyframes glisser { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+    /* ============ SECTIONS ============ */
+    section { padding: 90px 0; }
+    .titre-section { text-align: center; max-width: 640px; margin: 0 auto 50px; }
+    .titre-section .sur-titre { color: var(--emeraude-fonce); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .1em; }
+    .titre-section h2 { font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800; letter-spacing: -.02em; margin: 8px 0 12px; }
+    .titre-section p { color: var(--texte-doux); font-size: 1.05rem; }
+
+    /* ============ ANALYSEUR ============ */
+    #analyser { padding-top: 0; margin-top: -90px; position: relative; z-index: 5; }
+    .analyseur {
+      background: var(--blanc); border-radius: 26px; padding: 40px;
+      box-shadow: 0 25px 60px rgba(10,26,51,.15);
+      border: 1px solid var(--bordure);
+    }
+    .analyseur h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
+    .analyseur > p { color: var(--texte-doux); margin-bottom: 26px; }
+
+    .etape-label { font-weight: 700; font-size: .95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .etape-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--nuit); color: #fff; font-size: .8rem;
+      display: grid; place-items: center;
+    }
+
+    .types { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 30px; }
+    .type input { position: absolute; opacity: 0; pointer-events: none; }
+    .type label {
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
+      padding: 18px 10px; border-radius: 16px; cursor: pointer;
+      border: 2px solid var(--bordure); background: var(--fond);
+      transition: all .2s;
+      height: 100%;
+    }
+    .type label:hover { border-color: #a7f3d0; background: #f0fdf9; }
+    .type .icone { font-size: 1.7rem; }
+    .type .nom { font-weight: 700; font-size: .92rem; }
+    .type .desc { font-size: .78rem; color: var(--texte-doux); line-height: 1.3; }
+    .type input:checked + label {
+      border-color: var(--emeraude); background: #ecfdf5;
+      box-shadow: 0 0 0 4px rgba(16,185,129,.15);
+    }
+    .type input:focus-visible + label { outline: 3px solid var(--bleu); outline-offset: 2px; }
+
+    .zone-saisie { display: flex; gap: 12px; }
+    .champ {
+      flex: 1; font-family: inherit; font-size: 1rem;
+      padding: 16px 18px; border-radius: 14px;
+      border: 2px solid var(--bordure); background: var(--fond); color: var(--texte);
+      outline: none; transition: border-color .2s, background .2s;
+    }
+    .champ:focus { border-color: var(--emeraude); background: #fff; }
+    textarea.champ { min-height: 130px; resize: vertical; }
+    .zone-saisie.message { flex-direction: column; }
+    .zone-saisie.message .btn { align-self: flex-end; }
+    .btn:disabled { opacity: .6; cursor: wait; transform: none; }
+    .aide { color: var(--texte-doux); font-size: .88rem; margin-top: 10px; }
+    .exemples { margin-top: 14px; font-size: .88rem; color: var(--texte-doux); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .exemples button {
+      font-family: inherit; font-size: .82rem; cursor: pointer;
+      background: #eef2f8; border: 1px solid var(--bordure); color: var(--nuit-2);
+      padding: 5px 12px; border-radius: 999px; transition: background .2s;
+    }
+    .exemples button:hover { background: #e0e7f1; }
+
+    /* ============ RÉSULTATS ============ */
+    #resultats { margin-top: 32px; display: grid; gap: 18px; }
+    .resultat {
+      border: 1px solid var(--bordure); border-radius: var(--rayon);
+      overflow: hidden; background: #fff;
+      animation: glisser .4s ease both;
+    }
+    .resultat-entete { display: flex; align-items: center; gap: 22px; padding: 24px; }
+    .resultat-entete.vert   { background: linear-gradient(90deg, #f0fdf4, #fff); border-left: 6px solid var(--vert); }
+    .resultat-entete.orange { background: linear-gradient(90deg, #fffbeb, #fff); border-left: 6px solid var(--orange); }
+    .resultat-entete.rouge  { background: linear-gradient(90deg, #fef2f2, #fff); border-left: 6px solid var(--rouge); }
+
+    .jauge {
+      --valeur: 0; --couleur: var(--vert);
+      width: 96px; height: 96px; border-radius: 50%; flex-shrink: 0;
+      background: conic-gradient(var(--couleur) calc(var(--valeur) * 1%), #e8edf4 0);
+      display: grid; place-items: center;
+    }
+    .jauge-interieur {
+      width: 76px; height: 76px; border-radius: 50%; background: #fff;
+      display: grid; place-items: center; text-align: center; line-height: 1;
+    }
+    .jauge-interieur strong { font-size: 1.6rem; font-weight: 800; }
+    .jauge-interieur small { display: block; font-size: .65rem; color: var(--texte-doux); margin-top: 3px; }
+
+    .verdict { font-size: 1.5rem; font-weight: 800; }
+    .verdict.vert { color: var(--vert); }
+    .verdict.orange { color: #b45309; }
+    .verdict.rouge { color: var(--rouge); }
+    .url-analysee { color: var(--texte-doux); font-size: .9rem; word-break: break-all; margin-top: 2px; }
+
+    .resultat-corps { padding: 6px 24px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .bloc h4 { font-size: .9rem; text-transform: uppercase; letter-spacing: .06em; color: var(--texte-doux); margin: 14px 0 10px; }
+    .bloc ul { list-style: none; display: grid; gap: 8px; }
+    .bloc li { padding: 10px 12px; border-radius: 10px; font-size: .92rem; display: flex; gap: 10px; align-items: flex-start; }
+    .bloc li.danger { background: #fef2f2; color: #7f1d1d; }
+    .bloc li.attention { background: #fffbeb; color: #78350f; }
+    .bloc li.info { background: #f1f5f9; color: #334155; }
+    .bloc li.ok { background: #f0fdf4; color: #166534; }
+
+    .conseil {
+      margin: 0 24px 24px; padding: 16px 18px; border-radius: 14px;
+      background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; font-size: .92rem;
+    }
+    .conseil strong { display: block; margin-bottom: 4px; }
+
+    .erreur-boite { padding: 18px 20px; border-radius: 14px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .chargement { display: flex; align-items: center; gap: 12px; padding: 20px; color: var(--texte-doux); }
+    .rond { width: 22px; height: 22px; border: 3px solid #d1fae5; border-top-color: var(--emeraude); border-radius: 50%; animation: tourner .8s linear infinite; }
+    @keyframes tourner { to { transform: rotate(360deg); } }
+
+    /* ============ COMMENT ÇA MARCHE ============ */
+    .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .carte {
+      background: #fff; border-radius: var(--rayon); padding: 30px;
+      border: 1px solid var(--bordure); box-shadow: var(--ombre);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .carte:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(10,26,51,.12); }
+    .carte .icone-ronde {
+      width: 54px; height: 54px; border-radius: 14px;
+      display: grid; place-items: center; font-size: 1.5rem; margin-bottom: 18px;
+      background: linear-gradient(135deg, #d1fae5, #dbeafe);
+    }
+    .carte h3 { font-size: 1.15rem; margin-bottom: 8px; }
+    .carte p { color: var(--texte-doux); font-size: .95rem; }
+
+    /* ============ CE QU'ON VÉRIFIE ============ */
+    .fond-sombre { background: var(--nuit); color: #fff; }
+    .fond-sombre .titre-section p { color: #94a3b8; }
+    .fond-sombre .titre-section .sur-titre { color: #34d399; }
+    .verifs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .verif {
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px; padding: 22px;
+    }
+    .verif .icone { font-size: 1.5rem; }
+    .verif h3 { font-size: 1rem; margin: 10px 0 6px; }
+    .verif p { color: #94a3b8; font-size: .88rem; }
+
+    /* ============ CONSEILS ============ */
+    .conseils { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .conseils .carte { display: flex; gap: 16px; }
+    .conseils .carte .icone-ronde { flex-shrink: 0; margin: 0; }
+
+    /* ============ PIED DE PAGE ============ */
+    footer { background: var(--nuit); color: #94a3b8; padding: 40px 0; font-size: .9rem; }
+    footer .largeur { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; }
+    footer .logo { font-size: 1.1rem; }
+
+    /* ============ MOBILE ============ */
+    @media (max-width: 900px) {
+      .hero .largeur { grid-template-columns: 1fr; }
+      .apercu { display: none; }
+      .types { grid-template-columns: repeat(2, 1fr); }
+      .etapes, .verifs, .conseils, .resultat-corps { grid-template-columns: 1fr; }
+      .menu a:not(.btn) { display: none; }
+      .analyseur { padding: 26px; }
+      .zone-saisie { flex-direction: column; }
+    }
+
+    /* ============ BOUTON DE LANGUE ============ */
+    .langue {
+      display: inline-flex; background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18); border-radius: 999px; padding: 3px;
+    }
+    .langue button {
+      font-family: inherit; font-weight: 700; font-size: .8rem; letter-spacing: .04em;
+      border: none; background: transparent; color: #c7d2e3;
+      padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: all .2s;
+    }
+    .langue button[aria-pressed="true"] { background: #fff; color: var(--nuit); }
+    .langue button:hover:not([aria-pressed="true"]) { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- =====================================================================
+       TRADUCTION : chaque texte a un attribut data-i18n="cle".
+       Les textes français et anglais sont dans l'objet TEXTES du script,
+       en bas de la page.
+       ===================================================================== -->
+
+  <!-- ================= NAVIGATION ================= -->
+  <nav>
+    <div class="largeur">
+      <a href="#" class="logo"><div class="logo-icone">🛡️</div><div>Lien<span>Sûr</span></div></a>
+      <div class="menu">
+        <a href="#comment" data-i18n="nav_comment">Comment ça marche</a>
+        <a href="#verifications" data-i18n="nav_verifs">Vérifications</a>
+        <a href="#conseils" data-i18n="nav_conseils">Conseils</a>
+        <div class="langue" role="group" aria-label="Langue / Language">
+          <button type="button" data-langue="fr" aria-pressed="true">FR</button>
+          <button type="button" data-langue="en" aria-pressed="false">EN</button>
+        </div>
+        <a href="#analyser" class="btn btn-principal" data-i18n="nav_analyser">Analyser un lien</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= PRÉSENTATION ================= -->
+  <header class="hero">
+    <div class="largeur">
+      <div>
+        <div class="pastille" data-i18n="hero_pastille">🔒 Gratuit · Sans inscription · Aucun lien ouvert</div>
+        <h1 data-i18n-html="hero_titre">Un doute sur un lien&nbsp;?<br><span class="accent">Vérifiez avant de cliquer.</span></h1>
+        <p class="intro" data-i18n="hero_intro">Faux colis de Postes Canada, fausse alerte bancaire, remboursement de l'ARC… LienSûr analyse le lien en quelques secondes et vous explique clairement s'il est dangereux.</p>
+        <div class="hero-boutons">
+          <a href="#analyser" class="btn btn-principal" data-i18n="hero_btn1">Vérifier un lien maintenant →</a>
+          <a href="#comment" class="btn btn-secondaire" data-i18n="hero_btn2">Comment ça marche</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>10+</strong><span data-i18n="stat1">vérifications</span></div>
+          <div class="stat"><strong>75+</strong><span data-i18n="stat2">marques surveillées</span></div>
+          <div class="stat"><strong>&lt; 5 s</strong><span data-i18n="stat3">par analyse</span></div>
+        </div>
+      </div>
+
+      <div class="apercu" aria-hidden="true">
+        <div class="apercu-ligne"><span>✅</span><span class="domaine">desjardins.com</span><span class="etiquette vert" data-i18n="verdict_vert">Sûr</span></div>
+        <div class="apercu-ligne"><span>⚠️</span><span class="domaine">promo-colis-livraison.top</span><span class="etiquette orange" data-i18n="verdict_orange">Suspect</span></div>
+        <div class="apercu-ligne"><span>❌</span><span class="domaine">postescanada-frais.xyz/colis</span><span class="etiquette rouge" data-i18n="verdict_rouge">Dangereux</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= ANALYSEUR ================= -->
+  <section id="analyser">
+    <div class="largeur">
+      <div class="analyseur">
+        <h2 data-i18n="an_titre">Analyser un lien</h2>
+        <p data-i18n="an_intro">Choisissez d'où vient le lien : on adapte les conseils à votre situation.</p>
+
+        <div class="etape-label"><span class="etape-num">1</span><span data-i18n="an_etape1">D'où vient ce lien ?</span></div>
+        <div class="types" role="radiogroup">
+          <div class="type">
+            <input type="radio" name="type" id="t-texto" value="texto" checked>
+            <label for="t-texto"><span class="icone">📱</span><span class="nom" data-i18n="type_texto">Texto</span><span class="desc" data-i18n="type_texto_d">Reçu par SMS</span></label>
+          </div>
+          <div class="type">
+            <input type="radio" name="type" id="t-courriel" value="courriel">
+            <label for="t-courriel"><span class="icone">✉️</span><span class="nom" data-i18n="type_courriel">Courriel</span><span class="desc" data-i18n="type_courriel_d">Reçu par e-mail</span></label>
+          </div>
+          <div class="type">
+            <input type="radio" name="type" id="t-achat" value="achat">
+            <label for="t-achat"><span class="icone">🛒</span><span class="nom" data-i18n="type_achat">Achat en ligne</span><span class="desc" data-i18n="type_achat_d">Boutique, Marketplace</span></label>
+          </div>
+          <div class="type">
+            <input type="radio" name="type" id="t-court" value="court">
+            <label for="t-court"><span class="icone">🔗</span><span class="nom" data-i18n="type_court">Lien raccourci</span><span class="desc">bit.ly, tinyurl…</span></label>
+          </div>
+          <div class="type">
+            <input type="radio" name="type" id="t-message" value="message">
+            <label for="t-message"><span class="icone">📝</span><span class="nom" data-i18n="type_message">Message complet</span><span class="desc" data-i18n="type_message_d">Plusieurs liens</span></label>
+          </div>
+        </div>
+
+        <div class="etape-label"><span class="etape-num">2</span><span id="label-saisie">Collez le lien</span></div>
+        <form id="formulaire">
+          <div class="zone-saisie" id="zone-lien">
+            <input id="champ-url" class="champ" type="text" autocomplete="off">
+            <button class="btn btn-principal" type="submit" data-i18n="btn_analyser">🔍 Analyser</button>
+          </div>
+          <div class="zone-saisie message" id="zone-message" hidden>
+            <textarea id="champ-message" class="champ" data-i18n-placeholder="message_placeholder"></textarea>
+            <button class="btn btn-principal" type="submit" data-i18n="btn_analyser_msg">🔍 Analyser le message</button>
+          </div>
+        </form>
+        <p class="aide" data-i18n="aide">💡 Ne cliquez pas sur le lien : faites un appui long dessus, puis « Copier le lien ».</p>
+        <div class="exemples" id="exemples"></div>
+
+        <div id="resultats" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= COMMENT ÇA MARCHE ================= -->
+  <section id="comment">
+    <div class="largeur">
+      <div class="titre-section">
+        <div class="sur-titre" data-i18n="cm_sur">Simple et rapide</div>
+        <h2 data-i18n="cm_titre">Comment ça marche ?</h2>
+        <p data-i18n="cm_intro">Trois étapes, aucune inscription. Le site n'ouvre jamais la page suspecte à votre place.</p>
+      </div>
+      <div class="etapes">
+        <div class="carte"><div class="icone-ronde">📋</div><h3 data-i18n="cm1_t">1. Copiez le lien</h3><p data-i18n="cm1_p">Sans cliquer dessus : faites un appui long ou un clic droit, puis « Copier l'adresse du lien ».</p></div>
+        <div class="carte"><div class="icone-ronde">🔎</div><h3 data-i18n="cm2_t">2. On l'analyse</h3><p data-i18n="cm2_p">Plus de 10 vérifications : imitation de marque, âge du domaine, mots piégés, extension douteuse…</p></div>
+        <div class="carte"><div class="icone-ronde">✅</div><h3 data-i18n="cm3_t">3. Vous décidez</h3><p data-i18n="cm3_p">Un score de 0 à 100, un verdict clair et l'explication de chaque signal d'alerte.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CE QU'ON VÉRIFIE ================= -->
+  <section id="verifications" class="fond-sombre">
+    <div class="largeur">
+      <div class="titre-section">
+        <div class="sur-titre" data-i18n="vf_sur">Sous le capot</div>
+        <h2 data-i18n="vf_titre">Ce que LienSûr vérifie</h2>
+        <p data-i18n="vf_intro">Les mêmes signaux que les experts en sécurité regardent en premier.</p>
+      </div>
+      <div class="verifs">
+        <div class="verif"><div class="icone">🎭</div><h3 data-i18n="vf1_t">Imitation de marque</h3><p data-i18n="vf1_p">« paypa1 », « desjardlns »… on repère les fausses copies de 75+ marques.</p></div>
+        <div class="verif"><div class="icone">📅</div><h3 data-i18n="vf2_t">Âge du domaine</h3><p data-i18n="vf2_p">Un site créé il y a 3 jours qui se dit être votre banque ? Très suspect.</p></div>
+        <div class="verif"><div class="icone">🔐</div><h3 data-i18n="vf3_t">Connexion HTTPS</h3><p data-i18n="vf3_p">On vérifie si la connexion au site est chiffrée.</p></div>
+        <div class="verif"><div class="icone">🏷️</div><h3 data-i18n="vf4_t">Extension douteuse</h3><p data-i18n="vf4_p">.xyz, .top, .click… des extensions très utilisées par les fraudeurs.</p></div>
+        <div class="verif"><div class="icone">🪤</div><h3 data-i18n="vf5_t">Mots piégés</h3><p data-i18n="vf5_p">« verify », « colis », « remboursement » : le vocabulaire typique des arnaques.</p></div>
+        <div class="verif"><div class="icone">🔢</div><h3 data-i18n="vf6_t">Adresse IP</h3><p data-i18n="vf6_p">Un vrai site d'entreprise n'utilise presque jamais une adresse en chiffres.</p></div>
+        <div class="verif"><div class="icone">🔗</div><h3 data-i18n="vf7_t">Liens raccourcis</h3><p data-i18n="vf7_p">On suit le lien bit.ly ou tinyurl pour révéler sa vraie destination.</p></div>
+        <div class="verif"><div class="icone">🔤</div><h3 data-i18n="vf8_t">Lettres déguisées</h3><p data-i18n="vf8_p">Des lettres d'autres alphabets qui imitent les nôtres (« аpple »).</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONSEILS ================= -->
+  <section id="conseils">
+    <div class="largeur">
+      <div class="titre-section">
+        <div class="sur-titre" data-i18n="cs_sur">Restez prudent</div>
+        <h2 data-i18n="cs_titre">4 réflexes anti-arnaque</h2>
+        <p data-i18n="cs_intro">Aucun outil n'est parfait. Ces réflexes vous protègent même quand un lien a l'air sûr.</p>
+      </div>
+      <div class="conseils">
+        <div class="carte"><div class="icone-ronde">⏳</div><div><h3 data-i18n="cs1_t">Méfiez-vous de l'urgence</h3><p data-i18n="cs1_p">« Votre compte sera bloqué dans 24 h » : la pression est l'arme numéro 1 des fraudeurs.</p></div></div>
+        <div class="carte"><div class="icone-ronde">🏦</div><div><h3 data-i18n="cs2_t">Passez par l'appli officielle</h3><p data-i18n="cs2_p">Au lieu de cliquer, ouvrez vous-même l'application de votre banque ou tapez l'adresse.</p></div></div>
+        <div class="carte"><div class="icone-ronde">🔑</div><div><h3 data-i18n="cs3_t">Jamais de mot de passe par lien</h3><p data-i18n="cs3_p">Aucune banque ni l'ARC ne vous demandera vos codes par texto ou courriel.</p></div></div>
+        <div class="carte"><div class="icone-ronde">📣</div><div><h3 data-i18n="cs4_t">Signalez la fraude</h3><p data-i18n="cs4_p">Transférez les textos suspects au 7726 et signalez-les au Centre antifraude du Canada.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PIED DE PAGE ================= -->
+  <footer>
+    <div class="largeur">
+      <div class="logo"><div class="logo-icone">🛡️</div><div>Lien<span>Sûr</span></div></div>
+      <p data-i18n="footer">Projet étudiant · Un score faible ne garantit pas qu'un site est sûr. En cas de doute, ne cliquez pas.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ============ CONFIGURATION ============
+    // Si la page vient du serveur Flask (port 5001), on utilise la même adresse.
+    // Sinon (double-clic, Live Server…), on vise directement le serveur Flask.
+    const ADRESSE_SERVEUR = (location.port === "5001") ? "" : "http://127.0.0.1:5001";
+
+    // =====================================================================
+    // TOUS LES TEXTES DU SITE, EN FRANÇAIS ET EN ANGLAIS
+    // Pour changer un texte : modifie-le ici, dans les deux langues.
+    // =====================================================================
+    const TEXTES = {
+      fr: {
+        titre_page: "LienSûr — Vérifiez un lien avant de cliquer",
+        nav_comment: "Comment ça marche", nav_verifs: "Vérifications", nav_conseils: "Conseils",
+        nav_analyser: "Analyser un lien",
+        hero_pastille: "🔒 Gratuit · Sans inscription · Aucun lien ouvert",
+        hero_titre: 'Un doute sur un lien&nbsp;?<br><span class="accent">Vérifiez avant de cliquer.</span>',
+        hero_intro: "Faux colis de Postes Canada, fausse alerte bancaire, remboursement de l'ARC… LienSûr analyse le lien en quelques secondes et vous explique clairement s'il est dangereux.",
+        hero_btn1: "Vérifier un lien maintenant →", hero_btn2: "Comment ça marche",
+        stat1: "vérifications", stat2: "marques surveillées", stat3: "par analyse",
+        verdict_vert: "Sûr", verdict_orange: "Suspect", verdict_rouge: "Dangereux",
+
+        an_titre: "Analyser un lien",
+        an_intro: "Choisissez d'où vient le lien : on adapte les conseils à votre situation.",
+        an_etape1: "D'où vient ce lien ?",
+        type_texto: "Texto", type_texto_d: "Reçu par SMS",
+        type_courriel: "Courriel", type_courriel_d: "Reçu par e-mail",
+        type_achat: "Achat en ligne", type_achat_d: "Boutique, Marketplace",
+        type_court: "Lien raccourci",
+        type_message: "Message complet", type_message_d: "Plusieurs liens",
+        label_lien: "Collez le lien", label_message: "Collez le message au complet",
+        btn_analyser: "🔍 Analyser", btn_analyser_msg: "🔍 Analyser le message",
+        message_placeholder: "Collez ici le texto ou le courriel au complet. On trouvera tous les liens qu'il contient.",
+        aide: "💡 Ne cliquez pas sur le lien : faites un appui long dessus, puis « Copier le lien ».",
+        essayez: "Essayez :", exemple_texto: "Exemple de faux texto",
+        faux_texto: "Postes Canada : votre colis est en attente. Des frais de 1,99 $ sont requis : postescanada-frais.xyz/colis . Sinon il sera retourné. Info : https://www.canadapost.ca",
+
+        signaux: "Signaux d'alerte", informations: "Informations", aucun_signal: "Aucun signal d'alerte détecté.",
+        risque: "risque /100", conseil: "💡 Conseil",
+        chargement: n => `Analyse de ${n} lien${n > 1 ? "s" : ""} en cours…`,
+        aucun_lien: "Aucun lien trouvé dans ce message.",
+        msg_rouge: "❌ Ce message contient au moins un lien dangereux.",
+        msg_orange: "⚠️ Ce message contient un lien suspect.",
+        msg_vert: "✅ Aucun lien dangereux détecté dans ce message.",
+        liens_trouves: n => `${n} lien${n > 1 ? "s" : ""} trouvé${n > 1 ? "s" : ""}`,
+        serveur_absent: "Le serveur Python ne répond pas. Lancez d'abord <b>app.py</b> dans VS Code, puis réessayez.",
+
+        cm_sur: "Simple et rapide", cm_titre: "Comment ça marche ?",
+        cm_intro: "Trois étapes, aucune inscription. Le site n'ouvre jamais la page suspecte à votre place.",
+        cm1_t: "1. Copiez le lien", cm1_p: "Sans cliquer dessus : faites un appui long ou un clic droit, puis « Copier l'adresse du lien ».",
+        cm2_t: "2. On l'analyse", cm2_p: "Plus de 10 vérifications : imitation de marque, âge du domaine, mots piégés, extension douteuse…",
+        cm3_t: "3. Vous décidez", cm3_p: "Un score de 0 à 100, un verdict clair et l'explication de chaque signal d'alerte.",
+
+        vf_sur: "Sous le capot", vf_titre: "Ce que LienSûr vérifie",
+        vf_intro: "Les mêmes signaux que les experts en sécurité regardent en premier.",
+        vf1_t: "Imitation de marque", vf1_p: "« paypa1 », « desjardlns »… on repère les fausses copies de 75+ marques.",
+        vf2_t: "Âge du domaine", vf2_p: "Un site créé il y a 3 jours qui se dit être votre banque ? Très suspect.",
+        vf3_t: "Connexion HTTPS", vf3_p: "On vérifie si la connexion au site est chiffrée.",
+        vf4_t: "Extension douteuse", vf4_p: ".xyz, .top, .click… des extensions très utilisées par les fraudeurs.",
+        vf5_t: "Mots piégés", vf5_p: "« verify », « colis », « remboursement » : le vocabulaire typique des arnaques.",
+        vf6_t: "Adresse IP", vf6_p: "Un vrai site d'entreprise n'utilise presque jamais une adresse en chiffres.",
+        vf7_t: "Liens raccourcis", vf7_p: "On suit le lien bit.ly ou tinyurl pour révéler sa vraie destination.",
+        vf8_t: "Lettres déguisées", vf8_p: "Des lettres d'autres alphabets qui imitent les nôtres (« аpple »).",
+
+        cs_sur: "Restez prudent", cs_titre: "4 réflexes anti-arnaque",
+        cs_intro: "Aucun outil n'est parfait. Ces réflexes vous protègent même quand un lien a l'air sûr.",
+        cs1_t: "Méfiez-vous de l'urgence", cs1_p: "« Votre compte sera bloqué dans 24 h » : la pression est l'arme numéro 1 des fraudeurs.",
+        cs2_t: "Passez par l'appli officielle", cs2_p: "Au lieu de cliquer, ouvrez vous-même l'application de votre banque ou tapez l'adresse.",
+        cs3_t: "Jamais de mot de passe par lien", cs3_p: "Aucune banque ni l'ARC ne vous demandera vos codes par texto ou courriel.",
+        cs4_t: "Signalez la fraude", cs4_p: "Transférez les textos suspects au 7726 et signalez-les au Centre antifraude du Canada.",
+        footer: "Projet étudiant · Un score faible ne garantit pas qu'un site est sûr. En cas de doute, ne cliquez pas.",
+
+        types: {
+          texto: {
+            placeholder: "ex. https://postescanada-livraison.xyz/colis",
+            exemples: ["postescanada-frais.xyz/colis", "desjardlns-securite.com/connexion", "https://www.desjardins.com"],
+            conseil: "Les arnaques par texto imitent souvent Postes Canada, l'ARC, Hydro-Québec ou votre banque. Ces organismes ne demandent jamais de payer ou de vous connecter par un lien SMS. Transférez le texto suspect au 7726."
+          },
+          courriel: {
+            placeholder: "ex. https://secure-paypal-verify.com/login",
+            exemples: ["paypa1-secure-login.xyz/verify", "microsoft-account-update.click", "https://www.paypal.com"],
+            conseil: "Vérifiez l'adresse de l'expéditeur, pas seulement son nom affiché. Un courriel urgent qui vous demande de « vérifier votre compte » est un classique de l'hameçonnage."
+          },
+          achat: {
+            placeholder: "ex. https://amazon-soldes-80.top/produit",
+            exemples: ["amazon-soldes-80.top/produit", "costco-cadeau-gagnant.xyz", "https://www.bestbuy.ca"],
+            conseil: "Un prix trop beau pour être vrai cache souvent une fausse boutique. Préférez les paiements par carte de crédit (remboursables) et méfiez-vous des virements Interac à des inconnus."
+          },
+          court: {
+            placeholder: "ex. https://bit.ly/3xYz12",
+            exemples: ["https://bit.ly/3example", "https://tinyurl.com/example"],
+            conseil: "Un lien raccourci cache sa vraie destination. LienSûr la suit pour vous sans ouvrir la page. Si la destination ne correspond pas à ce qu'on vous a promis, n'y allez pas."
+          },
+          message: {
+            placeholder: "", exemples: [],
+            conseil: "Un seul lien dangereux suffit pour que tout le message soit une arnaque. Supprimez-le et bloquez l'expéditeur."
+          }
+        }
+      },
+
+      en: {
+        titre_page: "LienSûr — Check a link before you click",
+        nav_comment: "How it works", nav_verifs: "Checks", nav_conseils: "Tips",
+        nav_analyser: "Check a link",
+        hero_pastille: "🔒 Free · No sign-up · No link opened",
+        hero_titre: 'Not sure about a link?<br><span class="accent">Check before you click.</span>',
+        hero_intro: "Fake Canada Post parcels, fake bank alerts, CRA refunds… LienSûr checks the link in seconds and clearly explains whether it's dangerous.",
+        hero_btn1: "Check a link now →", hero_btn2: "How it works",
+        stat1: "checks", stat2: "brands monitored", stat3: "per check",
+        verdict_vert: "Safe", verdict_orange: "Suspicious", verdict_rouge: "Dangerous",
+
+        an_titre: "Check a link",
+        an_intro: "Choose where the link came from: we'll tailor the advice to your situation.",
+        an_etape1: "Where did this link come from?",
+        type_texto: "Text message", type_texto_d: "Received by SMS",
+        type_courriel: "Email", type_courriel_d: "Received by email",
+        type_achat: "Online shopping", type_achat_d: "Store, Marketplace",
+        type_court: "Short link",
+        type_message: "Full message", type_message_d: "Several links",
+        label_lien: "Paste the link", label_message: "Paste the full message",
+        btn_analyser: "🔍 Check", btn_analyser_msg: "🔍 Check the message",
+        message_placeholder: "Paste the full text message or email here. We'll find every link it contains.",
+        aide: "💡 Don't click the link: long-press it, then choose \"Copy link\".",
+        essayez: "Try:", exemple_texto: "Fake text example",
+        faux_texto: "Canada Post: your parcel is on hold. A $1.99 fee is required: canadapost-fees.xyz/parcel . Otherwise it will be returned. Info: https://www.canadapost.ca",
+
+        signaux: "Warning signs", informations: "Information", aucun_signal: "No warning signs detected.",
+        risque: "risk /100", conseil: "💡 Tip",
+        chargement: n => `Checking ${n} link${n > 1 ? "s" : ""}…`,
+        aucun_lien: "No links found in this message.",
+        msg_rouge: "❌ This message contains at least one dangerous link.",
+        msg_orange: "⚠️ This message contains a suspicious link.",
+        msg_vert: "✅ No dangerous links detected in this message.",
+        liens_trouves: n => `${n} link${n > 1 ? "s" : ""} found`,
+        serveur_absent: "The Python server isn't responding. Start <b>app.py</b> in VS Code first, then try again.",
+
+        cm_sur: "Quick and simple", cm_titre: "How does it work?",
+        cm_intro: "Three steps, no sign-up. The site never opens the suspicious page for you.",
+        cm1_t: "1. Copy the link", cm1_p: "Without clicking it: long-press or right-click, then \"Copy link address\".",
+        cm2_t: "2. We check it", cm2_p: "More than 10 checks: brand imitation, domain age, trap words, shady extensions…",
+        cm3_t: "3. You decide", cm3_p: "A score from 0 to 100, a clear verdict and an explanation of every warning sign.",
+
+        vf_sur: "Under the hood", vf_titre: "What LienSûr checks",
+        vf_intro: "The same signs security experts look at first.",
+        vf1_t: "Brand imitation", vf1_p: "\"paypa1\", \"desjardlns\"… we spot fake copies of 75+ brands.",
+        vf2_t: "Domain age", vf2_p: "A site created 3 days ago claiming to be your bank? Very suspicious.",
+        vf3_t: "HTTPS connection", vf3_p: "We check whether the connection to the site is encrypted.",
+        vf4_t: "Shady extension", vf4_p: ".xyz, .top, .click… extensions widely used by scammers.",
+        vf5_t: "Trap words", vf5_p: "\"verify\", \"parcel\", \"refund\": the typical vocabulary of scams.",
+        vf6_t: "IP address", vf6_p: "A real company website almost never uses a numeric address.",
+        vf7_t: "Short links", vf7_p: "We follow bit.ly or tinyurl links to reveal their real destination.",
+        vf8_t: "Disguised letters", vf8_p: "Letters from other alphabets that imitate ours (\"аpple\").",
+
+        cs_sur: "Stay careful", cs_titre: "4 anti-scam reflexes",
+        cs_intro: "No tool is perfect. These reflexes protect you even when a link looks safe.",
+        cs1_t: "Beware of urgency", cs1_p: "\"Your account will be locked in 24 hours\": pressure is scammers' number 1 weapon.",
+        cs2_t: "Use the official app", cs2_p: "Instead of clicking, open your bank's app yourself or type the address.",
+        cs3_t: "Never a password via a link", cs3_p: "No bank and not the CRA will ask for your codes by text or email.",
+        cs4_t: "Report fraud", cs4_p: "Forward suspicious texts to 7726 and report them to the Canadian Anti-Fraud Centre.",
+        footer: "Student project · A low score doesn't guarantee a site is safe. When in doubt, don't click.",
+
+        types: {
+          texto: {
+            placeholder: "e.g. https://canadapost-delivery.xyz/parcel",
+            exemples: ["canadapost-fees.xyz/parcel", "desjardlns-security.com/login", "https://www.desjardins.com"],
+            conseil: "Text scams often impersonate Canada Post, the CRA, Hydro-Québec or your bank. These organizations never ask you to pay or log in through an SMS link. Forward the suspicious text to 7726."
+          },
+          courriel: {
+            placeholder: "e.g. https://secure-paypal-verify.com/login",
+            exemples: ["paypa1-secure-login.xyz/verify", "microsoft-account-update.click", "https://www.paypal.com"],
+            conseil: "Check the sender's actual address, not just the display name. An urgent email asking you to \"verify your account\" is a classic phishing trick."
+          },
+          achat: {
+            placeholder: "e.g. https://amazon-sale-80.top/product",
+            exemples: ["amazon-sale-80.top/product", "costco-gift-winner.xyz", "https://www.bestbuy.ca"],
+            conseil: "A price that's too good to be true often hides a fake store. Prefer credit card payments (refundable) and be wary of Interac transfers to strangers."
+          },
+          court: {
+            placeholder: "e.g. https://bit.ly/3xYz12",
+            exemples: ["https://bit.ly/3example", "https://tinyurl.com/example"],
+            conseil: "A short link hides its real destination. LienSûr follows it for you without opening the page. If the destination doesn't match what you were promised, don't go there."
+          },
+          message: {
+            placeholder: "", exemples: [],
+            conseil: "A single dangerous link is enough to make the whole message a scam. Delete it and block the sender."
+          }
+        }
+      }
+    };
+
+    // ============ LANGUE ACTUELLE ============
+    // On se souvient du choix de l'utilisateur (si le navigateur le permet).
+    function langueSauvegardee() {
+      try { return localStorage.getItem("langue"); } catch (e) { return null; }
+    }
+    let langue = langueSauvegardee()
+      || ((navigator.language || "fr").toLowerCase().startsWith("en") ? "en" : "fr");
+
+    // Raccourci : T("cle") retourne le texte dans la langue actuelle
+    function T(cle) { return TEXTES[langue][cle]; }
+
+    // ============ ÉLÉMENTS DE LA PAGE ============
+    const formulaire   = document.getElementById("formulaire");
+    const champUrl     = document.getElementById("champ-url");
+    const champMessage = document.getElementById("champ-message");
+    const zoneLien     = document.getElementById("zone-lien");
+    const zoneMessage  = document.getElementById("zone-message");
+    const zoneExemples = document.getElementById("exemples");
+    const labelSaisie  = document.getElementById("label-saisie");
+    const resultats    = document.getElementById("resultats");
+
+    function typeChoisi() {
+      return document.querySelector('input[name="type"]:checked').value;
+    }
+
+    // Protège contre l'injection de HTML
+    function echapper(texte) {
+      const div = document.createElement("div");
+      div.textContent = String(texte);
+      return div.innerHTML;
+    }
+
+    // ============ CHANGER DE LANGUE ============
+    function appliquerLangue(nouvelle) {
+      langue = nouvelle;
+      try { localStorage.setItem("langue", langue); } catch (e) {}
+
+      document.documentElement.lang = langue;
+      document.title = T("titre_page");
+
+      document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = T(el.dataset.i18n); });
+      document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = T(el.dataset.i18nHtml); });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => { el.placeholder = T(el.dataset.i18nPlaceholder); });
+
+      document.querySelectorAll("[data-langue]").forEach(b => {
+        b.setAttribute("aria-pressed", b.dataset.langue === langue ? "true" : "false");
+      });
+
+      mettreAJourType();
+    }
+    document.querySelectorAll("[data-langue]").forEach(b => {
+      b.addEventListener("click", () => appliquerLangue(b.dataset.langue));
+    });
+
+    // ============ CHANGEMENT DE TYPE DE LIEN ============
+    function mettreAJourType() {
+      const type = typeChoisi();
+      const infos = T("types")[type];
+      const estMessage = type === "message";
+
+      zoneLien.hidden = estMessage;
+      zoneMessage.hidden = !estMessage;
+      labelSaisie.textContent = estMessage ? T("label_message") : T("label_lien");
+      champUrl.placeholder = infos.placeholder;
+
+      zoneExemples.innerHTML = "";
+      const etiquette = document.createElement("span");
+      etiquette.textContent = T("essayez");
+      zoneExemples.appendChild(etiquette);
+
+      function ajouterExemple(texte, action) {
+        const bouton = document.createElement("button");
+        bouton.type = "button";
+        bouton.textContent = texte;
+        bouton.addEventListener("click", action);
+        zoneExemples.appendChild(bouton);
+      }
+
+      if (estMessage) {
+        ajouterExemple(T("exemple_texto"), () => {
+          champMessage.value = T("faux_texto");
+          formulaire.requestSubmit();
+        });
+      } else {
+        infos.exemples.forEach(ex => ajouterExemple(ex.replace(/^https?:\/\//, ""), () => {
+          champUrl.value = ex;
+          formulaire.requestSubmit();
+        }));
+      }
+      resultats.innerHTML = "";
+    }
+    document.querySelectorAll('input[name="type"]').forEach(r => r.addEventListener("change", mettreAJourType));
+
+    // ============ EXTRAIRE LES LIENS D'UN MESSAGE ============
+    function extraireLiens(texte) {
+      const motif = /\b((?:https?:\/\/|www\.)[^\s<>"']+|[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}(?:\/[^\s<>"']*)?)/gi;
+      const trouves = (texte.match(motif) || [])
+        .map(l => l.replace(/[.,;:!?)\]]+$/, ""))       // enlève la ponctuation finale
+        .filter(l => !/^\d+[.,]\d+$/.test(l));          // ignore les nombres comme 1,99
+      return [...new Set(trouves)].slice(0, 10);        // max 10 liens, sans doublon
+    }
+
+    // ============ APPEL AU SERVEUR PYTHON ============
+    async function analyser(url) {
+      const reponse = await fetch(ADRESSE_SERVEUR + "/api/analyser", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, langue })     // on envoie aussi la langue
+      });
+      return reponse.json();
+    }
+
+    // ============ AFFICHAGE D'UN RÉSULTAT ============
+    function carteResultat(r, avecConseil) {
+      if (r.erreur) {
+        return `<div class="erreur-boite">❌ ${echapper(r.erreur)}</div>`;
+      }
+      const couleurs = { vert: "var(--vert)", orange: "var(--orange)", rouge: "var(--rouge)" };
+      const icones = { danger: "❌", attention: "⚠️" };
+
+      const raisons = r.raisons.length
+        ? r.raisons.map(x => `<li class="${x.niveau}"><span>${icones[x.niveau] || "⚠️"}</span><span>${echapper(x.message)}</span></li>`).join("")
+        : `<li class="ok"><span>✅</span><span>${echapper(T("aucun_signal"))}</span></li>`;
+      const infos = r.infos.map(x => `<li class="info"><span>ℹ️</span><span>${echapper(x)}</span></li>`).join("");
+
+      const conseil = avecConseil
+        ? `<div class="conseil"><strong>${T("conseil")}</strong>${echapper(T("types")[typeChoisi()].conseil)}</div>`
+        : "";
+
+      return `
+        <div class="resultat">
+          <div class="resultat-entete ${r.couleur}">
+            <div class="jauge" style="--valeur:${Number(r.score)}; --couleur:${couleurs[r.couleur]}">
+              <div class="jauge-interieur"><div><strong>${Number(r.score)}</strong><small>${T("risque")}</small></div></div>
+            </div>
+            <div>
+              <div class="verdict ${r.couleur}">${echapper(r.verdict)}</div>
+              <div class="url-analysee">${echapper(r.url)}</div>
+            </div>
+          </div>
+          <div class="resultat-corps">
+            <div class="bloc"><h4>${T("signaux")}</h4><ul>${raisons}</ul></div>
+            <div class="bloc"><h4>${T("informations")}</h4><ul>${infos}</ul></div>
+          </div>
+          ${conseil}
+        </div>`;
+    }
+
+    // ============ ENVOI DU FORMULAIRE ============
+    formulaire.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const type = typeChoisi();
+      const boutons = formulaire.querySelectorAll("button");
+
+      let liens;
+      if (type === "message") {
+        liens = extraireLiens(champMessage.value);
+        if (!liens.length) {
+          resultats.innerHTML = `<div class="erreur-boite">${T("aucun_lien")}</div>`;
+          return;
+        }
+      } else {
+        const url = champUrl.value.trim();
+        if (!url) return;
+        liens = [url];
+      }
+
+      boutons.forEach(b => b.disabled = true);
+      resultats.innerHTML = `<div class="chargement"><div class="rond"></div>${T("chargement")(liens.length)}</div>`;
+
+      try {
+        const reponses = await Promise.all(liens.map(analyser));
+        let html = "";
+        if (type === "message") {
+          const pire = Math.max(...reponses.map(r => r.score || 0));
+          const couleur = pire >= 60 ? "rouge" : pire >= 30 ? "orange" : "vert";
+          html += `<div class="resultat"><div class="resultat-entete ${couleur}"><div class="verdict ${couleur}" style="font-size:1.2rem">${T("msg_" + couleur)} (${T("liens_trouves")(liens.length)})</div></div></div>`;
+          html += reponses.map(r => carteResultat(r, false)).join("");
+          html += `<div class="conseil" style="margin:0"><strong>${T("conseil")}</strong>${echapper(T("types").message.conseil)}</div>`;
+        } else {
+          html = carteResultat(reponses[0], true);
+        }
+        resultats.innerHTML = html;
+        resultats.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (err) {
+        resultats.innerHTML = `<div class="erreur-boite">${T("serveur_absent")}</div>`;
+      } finally {
+        boutons.forEach(b => b.disabled = false);
+      }
+    });
+
+    // ============ DÉMARRAGE ============
+    appliquerLangue(langue);
+  </script>
+</body>
+</html>
