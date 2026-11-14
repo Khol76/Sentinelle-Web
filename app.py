@@ -2,11 +2,29 @@
 # Une mini application Flask qui analyse une URL et lui donne un score de risque.
 
 
-from flask import Flask, redirect, render_template, request, session, url_for
-from urllib.parse import urlparse
 import ipaddress
 import os
-import marque
+import re
+from datetime import datetime, timezone
+from urllib.parse import urlparse
+
+import requests
+from flask import Flask, jsonify, render_template, request
+
+from chargement import charger_liste, charger_marques
+
+
+# ---------------------------------------------------------------------------
+# 1. LISTES DE RÉFÉRENCE
+#    Elles sont maintenant dans le dossier « donnees/ ».
+#    Pour ajouter une marque, un mot ou une extension, modifie ces fichiers.
+# ---------------------------------------------------------------------------
+
+MARQUES = charger_marques("marques.json")
+MOTS_SUSPECTS = charger_liste("mots_suspects.txt")
+EXTENSIONS_SUSPECTES = charger_liste("extensions.txt")
+RACCOURCISSEURS = charger_liste("raccourcisseurs.txt")
+SUFFIXES_DOUBLES = charger_liste("suffixes.txt")
 
 
 app = Flask(__name__)
