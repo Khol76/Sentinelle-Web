@@ -37,7 +37,7 @@ for domaines_officiels in MARQUES.values():
 
 # MODE_STRICT = True  : un site ABSENT de la base est considéré comme une FRAUDE.
 # MODE_STRICT = False : un site absent est seulement analysé avec les règles.
-MODE_STRICT = True
+MODE_STRICT = False
 
 # Vérification au démarrage : si 0 marque est chargée, marques.json a un problème
 print(f"  ✔ {len(MARQUES)} marques chargées")
