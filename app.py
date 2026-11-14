@@ -11,7 +11,8 @@ from urllib.parse import urlparse
 import requests
 from flask import Flask, jsonify, render_template, request, session, redirect, url_for
 
-from chargement import charger_liste, charger_marques
+from chargement import charger_liste, charger_marques, charger_messages
+
 # ---------------------------------------------------------------------------
 # 1. LISTES DE RÉFÉRENCE
 #    Elles sont maintenant dans le dossier « donnees/ ».
@@ -23,6 +24,7 @@ MOTS_SUSPECTS = charger_liste("mots_suspects.txt")
 EXTENSIONS_SUSPECTES = charger_liste("extensions.txt")
 RACCOURCISSEURS = charger_liste("raccourcisseurs.txt")
 SUFFIXES_DOUBLES = charger_liste("suffixes.txt")
+MESSAGES = charger_messages("messages.json")   # textes en français et en anglais
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
@@ -138,7 +140,7 @@ def verdict_pour(score):
 # Route 1 : la page d'accueil, qui affiche le formulaire
 @app.route("/")
 def accueil():
-    return render_template("index.html")
+    return render_template("index1.html")
 
 
 # Route 2 : reçoit le formulaire (méthode POST) et affiche le résultat
