@@ -138,7 +138,7 @@ def verdict_pour(score):
 # Route 1 : la page d'accueil, qui affiche le formulaire
 @app.route("/")
 def accueil():
-    return render_template("index1.html")
+    return render_template("index.html")
 
 
 # Route 2 : reçoit le formulaire (méthode POST) et affiche le résultat
