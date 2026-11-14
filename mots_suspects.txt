@@ -1,0 +1,38 @@
+# Mots souvent utilisés dans les liens d'hameçonnage
+# Une valeur par ligne. Les lignes qui commencent par # sont ignorées.
+
+login
+signin
+verify
+verification
+secure
+account
+update
+confirm
+banking
+password
+wallet
+gift
+free
+bonus
+prize
+winner
+unlock
+suspended
+connexion
+verifier
+compte
+securite
+remboursement
+colis
+livraison
+paiement
+cadeau
+gagnant
+
+# Mots anglais
+parcel
+delivery
+refund
+payment
+reward

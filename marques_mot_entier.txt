@@ -1,0 +1,46 @@
+# Marques qui sont aussi des mots de tous les jours.
+# Elles sont reconnues seulement comme MOT ENTIER dans l'adresse
+# (séparé par un point ou un tiret), pour éviter les fausses alertes.
+# Ex. : « budget-secure.com » -> détecté ; « budgetvoyage.com » -> pas détecté.
+
+canada
+quebec
+montreal
+ottawa
+toronto
+vancouver
+alberta
+ontario
+metro
+maxi
+budget
+national
+enterprise
+signal
+square
+lucky
+maple
+chess
+fast
+hotels
+booking
+monster
+indigo
+roots
+winners
+intact
+kick
+medium
+threads
+porter
+flair
+proton
+bilingual
+taxi
+max
+gap
+via
+exo
+stm
+hotels
+apple
