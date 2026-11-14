@@ -347,7 +347,7 @@ def autoriser_page_locale(reponse):
 # Route 1 : la page d'accueil
 @app.route("/")
 def accueil():
-    return render_template("index.html")
+    return render_template("index1.html")
 
 
 # Route 2 : l'API utilisée par index.html (reçoit et renvoie du JSON)
