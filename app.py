@@ -26,6 +26,7 @@ MOTS_SUSPECTS = charger_liste("mots_suspects.txt")
 EXTENSIONS_SUSPECTES = charger_liste("extensions.txt")
 RACCOURCISSEURS = charger_liste("raccourcisseurs.txt")
 SUFFIXES_DOUBLES = charger_liste("suffixes.txt")
+MARQUES_MOT_ENTIER = set(charger_liste("marques_mot_entier.txt"))
 MESSAGES = charger_messages("messages.json")   # textes en français et en anglais
 
 # --- BASE DE DONNÉES DES SITES DE CONFIANCE ---------------------------------
@@ -89,12 +90,15 @@ def domaine_est_officiel(domaine, officiels):
 
 def marque_imitee(domaine):
     """Retourne le nom de la marque imitée, ou None si tout est beau."""
+    # D'abord : si c'est le site officiel d'UNE des marques, ce n'est pas une imitation
+    if any(domaine_est_officiel(domaine, officiels) for officiels in MARQUES.values()):
+        return None
+
     domaine_traduit = domaine.translate(TRADUCTION_LEET)
     morceaux = re.split(r"[.-]", domaine_traduit)          # « paypal-securite.com » -> ["paypal", "securite", "com"]
-    for marque, officiels in MARQUES.items():
-        if domaine_est_officiel(domaine, officiels):
-            return None                                     # c'est le vrai site
-        if len(marque) <= 4:
+    # On teste les noms les plus longs d'abord (« canadiantire » avant « canada »)
+    for marque in sorted(MARQUES, key=len, reverse=True):
+        if len(marque) <= 4 or marque in MARQUES_MOT_ENTIER:
             trouve = marque in morceaux                     # marque courte : mot entier seulement (évite « bell » dans « isabelle »)
         else:
             trouve = marque in domaine_traduit.replace("-", "")
@@ -124,7 +128,7 @@ def faute_de_frappe(domaine):
     Retourne (morceau, marque) ou None."""
     for morceau in re.split(r"[.-]", domaine):
         for marque in MARQUES:
-            if len(marque) >= 6 and morceau != marque \
+            if len(marque) >= 6 and marque not in MARQUES_MOT_ENTIER and morceau != marque \
                     and abs(len(morceau) - len(marque)) <= 1 \
                     and distance_levenshtein(morceau, marque) == 1:
                 return morceau, marque
@@ -247,8 +251,9 @@ def analyser_url(url, langue="fr"):
         chemin = (morceaux.path + " " + morceaux.query).lower().translate(TRADUCTION_LEET)
         mots_chemin = re.split(r"[^a-z0-9]+", chemin)
         for nom_marque in MARQUES:
-            if (len(nom_marque) <= 4 and nom_marque in mots_chemin) or \
-               (len(nom_marque) > 4 and nom_marque in chemin.replace("-", "")):
+            mot_entier = len(nom_marque) <= 4 or nom_marque in MARQUES_MOT_ENTIER
+            if (mot_entier and nom_marque in mots_chemin) or \
+               (not mot_entier and nom_marque in chemin.replace("-", "")):
                 retirer(25, t("mentionne_marque", marque=nom_marque))
                 break
 
@@ -347,7 +352,7 @@ def autoriser_page_locale(reponse):
 # Route 1 : la page d'accueil
 @app.route("/")
 def accueil():
-    return render_template("index1.html")
+    return render_template("index.html")
 
 
 # Route 2 : l'API utilisée par index.html (reçoit et renvoie du JSON)
