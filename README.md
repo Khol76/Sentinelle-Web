@@ -58,7 +58,7 @@ Le fichier `jeux-de-tests.md` détaille 6 adresses avec le score et le verdict a
 | `https://www.paypa1.com/connexion` | 75 | Prudence |
 | `http://desjardins-securite.com` | 45 | Risqué |
 | `https://connexion.banque.nationale.securite-verification.com/session/identifiant/client` | 60 | Prudence |
-| `https://www.paypal.com/signin` | 100 | Probablement sûr |
+| `https://www.paypal.com/signin` | 100 | Aucun signal majeur |
 
 ## 🗂️ Structure du projet
 
