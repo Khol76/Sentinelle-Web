@@ -28,6 +28,22 @@ RACCOURCISSEURS = charger_liste("raccourcisseurs.txt")
 SUFFIXES_DOUBLES = charger_liste("suffixes.txt")
 MESSAGES = charger_messages("messages.json")   # textes en français et en anglais
 
+# --- BASE DE DONNÉES DES SITES DE CONFIANCE ---------------------------------
+# = les sites de sites_confiance.txt + les domaines officiels de marques.json
+SITES_CONFIANCE = set(charger_liste("sites_confiance.txt"))
+for domaines_officiels in MARQUES.values():
+    SITES_CONFIANCE.update(domaines_officiels)
+
+# MODE_STRICT = True  : un site ABSENT de la base est considéré comme une FRAUDE.
+# MODE_STRICT = False : un site absent est seulement analysé avec les règles.
+MODE_STRICT = True
+
+# Vérification au démarrage : si 0 marque est chargée, marques.json a un problème
+print(f"  ✔ {len(MARQUES)} marques chargées")
+print(f"  ✔ {len(SITES_CONFIANCE)} sites dans la base de confiance (mode strict : {'oui' if MODE_STRICT else 'non'})")
+if not MARQUES:
+    print("  ❌ AUCUNE marque chargée : vérifie donnees/marques.json (virgules, guillemets, accolades)")
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
 
@@ -50,6 +66,16 @@ def traduire(langue, cle, **valeurs):
 # avant de comparer, pour attraper les imitations déguisées.
 TRADUCTION_LEET = str.maketrans({"0": "o", "1": "l", "3": "e", "4": "a",
                                  "5": "s", "7": "t", "$": "s"})
+
+
+def site_de_confiance(domaine):
+    """Retourne le site de la base qui correspond au domaine, ou None.
+    Ex. : « mail.google.com » -> « google.com » ; « google.com.faux.xyz » -> None
+    """
+    for site in SITES_CONFIANCE:
+        if domaine == site or domaine.endswith("." + site):
+            return site
+    return None
 
 
 def domaine_est_officiel(domaine, officiels):
@@ -143,10 +169,11 @@ def age_du_domaine(domaine):
 # ---------------------------------------------------------------------------
 
 def analyser_url(url, langue="fr"):
-    """Retourne (score, raisons, infos) :
+    """Retourne (score, raisons, infos, dans_la_base) :
     - score de 0 (très risqué) à 100 (sûr)
     - raisons : liste de {"points", "niveau", "message"} en langage clair
     - infos : renseignements neutres (domaine, âge…)
+    - dans_la_base : True si le site est dans la base de confiance
     """
     score = 100
     raisons = []
@@ -169,9 +196,23 @@ def analyser_url(url, langue="fr"):
     domaine = (morceaux.hostname or "").lower()  # ex. "www.paypa1.com" (sans le chemin)
 
     if not domaine or ("." not in domaine and not est_adresse_ip(domaine)):
-        return 0, [{"points": 100, "niveau": "danger", "message": t("invalide")}], []
+        return 0, [{"points": 100, "niveau": "danger", "message": t("invalide")}], [], False
 
     principal = domaine_principal(domaine)
+
+    # --- ÉTAPE 0 : le site est-il dans la base de données de confiance ?
+    site = site_de_confiance(domaine)
+    # Un lien raccourci (bit.ly/abc, tinyurl.com/xyz) cache sa vraie destination :
+    # même si le raccourcisseur est connu, on ne fait pas confiance au lien.
+    est_raccourcisseur = (domaine in RACCOURCISSEURS or principal in RACCOURCISSEURS
+                          or site in ("bitly.com", "tinyurl.com")) \
+        and morceaux.path not in ("", "/")
+    if site and not est_raccourcisseur:
+        infos.append(t("domaine", domaine=principal))
+        infos.append(t("confiance", site=site))
+        return 100, [], infos, True
+    if est_raccourcisseur:
+        retirer(30, t("raccourci_confiance"))
     extension = domaine.rsplit(".", 1)[-1]
     infos.append(t("domaine", domaine=principal))
 
@@ -195,8 +236,21 @@ def analyser_url(url, langue="fr"):
         typo = faute_de_frappe(domaine)
         if typo:
             retirer(40, t("typo", imitation=typo[0], marque=typo[1]))
-    if any(domaine_est_officiel(domaine, off) for off in MARQUES.values()):
+    est_officiel = any(domaine_est_officiel(domaine, off) for off in MARQUES.values())
+    if est_officiel:
         infos.append(t("officiel"))
+
+    # --- Règle 4 bis : marque cachée dans le CHEMIN du lien
+    # ex. « secure-login.com/paypal/verify » : le site n'est pas PayPal,
+    # mais le lien essaie de le faire croire.
+    if not marque and not est_officiel:
+        chemin = (morceaux.path + " " + morceaux.query).lower().translate(TRADUCTION_LEET)
+        mots_chemin = re.split(r"[^a-z0-9]+", chemin)
+        for nom_marque in MARQUES:
+            if (len(nom_marque) <= 4 and nom_marque in mots_chemin) or \
+               (len(nom_marque) > 4 and nom_marque in chemin.replace("-", "")):
+                retirer(25, t("mentionne_marque", marque=nom_marque))
+                break
 
     # --- Règle 5 : « @ » dans l'adresse (cache la vraie destination)
     if "@" in url_analysee.split("://", 1)[1]:
@@ -225,10 +279,6 @@ def analyser_url(url, langue="fr"):
     if "xn--" in domaine or any(ord(c) > 127 for c in domaine):
         retirer(35, t("caracteres"))
 
-    # --- Règle 11 : lien raccourci (cache la destination)
-    if domaine in RACCOURCISSEURS or principal in RACCOURCISSEURS:
-        retirer(15, t("court_cache"))
-
     # --- Règle 12 : domaine tout neuf
     if not est_adresse_ip(domaine):
         jours = age_du_domaine(principal)
@@ -241,13 +291,20 @@ def analyser_url(url, langue="fr"):
             elif jours < 180:
                 retirer(15, t("age_recent"))
 
+    # --- Site absent de la base de confiance
+    if MODE_STRICT:
+        raisons.append({"points": 100, "niveau": "danger", "message": t("inconnu")})
+        score = min(score, 20)            # toujours dans le rouge
+
     score = max(0, score)
     raisons.sort(key=lambda r: -r["points"])
-    return score, raisons, infos
+    return score, raisons, infos, False
 
 
-def verdict_pour(score, langue="fr"):
+def verdict_pour(score, langue="fr", dans_la_base=True):
     """Traduit le score en verdict + couleur d'affichage."""
+    if MODE_STRICT and not dans_la_base:
+        return traduire(langue, "verdict_fraude"), "rouge"
     if score >= 80:
         couleur = "vert"
     elif score >= 50:
@@ -310,8 +367,8 @@ def api_analyser():
     if len(url) > 2000:
         return jsonify({"erreur": traduire(langue, "trop_long")}), 400
 
-    score, raisons, infos = analyser_url(url, langue)
-    verdict, couleur = verdict_pour(score, langue)
+    score, raisons, infos, dans_la_base = analyser_url(url, langue)
+    verdict, couleur = verdict_pour(score, langue, dans_la_base)
     historique = ajouter_historique(url, score, verdict, couleur) if enregistrer \
         else session.get("historique", [])
 
@@ -343,8 +400,8 @@ def api_effacer_historique():
 @app.route("/analyser", methods=["POST"])
 def analyser():
     url = request.form["url"]
-    score, raisons, _ = analyser_url(url)
-    verdict, couleur = verdict_pour(score)
+    score, raisons, _, dans_la_base = analyser_url(url)
+    verdict, couleur = verdict_pour(score, "fr", dans_la_base)
     historique = ajouter_historique(url, score, verdict, couleur)
     return render_template("resultat.html", url=url, score=score,
                            raisons=[r["message"] for r in raisons],
