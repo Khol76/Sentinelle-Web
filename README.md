@@ -5,6 +5,9 @@ Mini application web en **Python + Flask** qui analyse une adresse web et lui at
 > ⚠️ L'analyse est purement textuelle : l'application ne visite jamais les liens analysés.
 
 ## 🔍 Les 12 règles de détection
+
+| # | Règle | Pénalité |
+|---|-------|----------|
 | 1 | Connexion non chiffrée (absence de HTTPS) | −10 |
 | 2 | Adresse IP au lieu d'un nom de domaine | −35 |
 | 3 | Lien très long (plus de 100 caractères) | −10 |
