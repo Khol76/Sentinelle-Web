@@ -6,11 +6,7 @@ from flask import Flask, redirect, render_template, request, session, url_for
 from urllib.parse import urlparse
 import ipaddress
 import os
-<<<<<<< HEAD
-=======
 import marque
->>>>>>> d5f14f56d307e545374dcbad659134ec904b190f
-
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "cle-d-entrainement-sentinelle")
@@ -45,7 +41,7 @@ def domaine_est_officiel(domaine, officiels):
 def marque_imitee(domaine):
     """Retourne le nom de la marque imitée, ou None si tout est beau."""
     domaine_traduit = domaine.translate(TRADUCTION_LEET)
-    for marque, officiels in MARQUES.items():
+    for marque, officiels in marque.items():
         if marque in domaine_traduit and not domaine_est_officiel(domaine, officiels):
             return marque
     return None
@@ -57,7 +53,15 @@ def analyser_url(url):
     score = 100
     raisons = []
 
- """a mettre ici les regles"""
+    # Si l'utilisateur n'a pas mis de schéma (http/https), on en ajoute un
+    # pour que urlparse puisse bien découper l'adresse.
+    url_analysee = url if "://" in url else "http://" + url
+    morceaux = urlparse(url_analysee)
+    domaine = morceaux.hostname or ""  # ex. "www.paypa1.com" (sans le chemin)
+
+
+
+ """a mettre ici les règles"""
 
 
 
