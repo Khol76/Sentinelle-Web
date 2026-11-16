@@ -64,14 +64,14 @@ Ouvrir ensuite **http://127.0.0.1:5001** dans le navigateur.
 | `https://www.google.com` | 100 | Probablement sur|
 | `https://paypa1.com` | 60 | Prudence |
 | `http://google.com@192.168.0.25` | 25 | Risqué |
-| `htlogin.secure.update.paypa1-secure-verify.xyz/verify-colis-remboursement-urgent-connexion-securisee-1234567890` | 0 | Risqué |
+| `login.secure.update.paypa1-secure-verify.xyz/verify-colis-remboursement-urgent-connexion-securisee-1234567890` | 0 | Risqué |
 | `https://bit.ly/3xYz12` | 70 | Prudence |
 | `https://xn--pple-43d.com` | 50 | Prudence |
 
 ## 🗂️ Structure du projet
 
 ```
-sentinelle-pratique/
+sentinelle-web/
 ├── app.py                       ← serveur Flask + logique d'analyse (12 règles)
 ├── chargement.py                ← chargement des listes de référence
 ├── requirements.txt             ← dépendances (Flask, requests)
@@ -79,11 +79,11 @@ sentinelle-pratique/
 │   └── extensions.txt           ← extensions souvent abusées, ex .xyz (règle 6)
 │   └── marques.json             ← marques connues et leurs domaines officiels (règle 4)
 │   └── marques_mot_entier.txt   ← marques aussi mais mots courants, mot entier seulement
-│   └── messages.json            ← testes de l'interface en Français et Anglais
-│   └── mots_suspects.txt        ← mot typiques des arnaques (règle 9) 
+│   └── messages.json            ← textes de l'interface en Français et Anglais
+│   └── mots_suspects.txt        ← mots typiques des arnaques (règle 9) 
 │   └── raccourcisseurs.txt      ← raccourcisseurs connus, ex. bit.ly (règle 11)
-│   └── sites_confiance.txt      ← base de donnée pour sites de confiance
-│   └── suffixes.txt             ← suffixe doubles, ex. co.uk
+│   └── sites_confiance.txt      ← base de données pour sites de confiance
+│   └── suffixes.txt             ← suffixes doubles, ex. co.uk
 ├── static/
 │   └── style.css                ← feuille de style partagée (marine/or)
 └── templates/
