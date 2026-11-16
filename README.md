@@ -16,7 +16,7 @@ Mini application web en **Python + Flask** qui analyse une adresse web et lui at
 | 6 | Extension suspecte | −20 |
 | 7 | Trois sous-domaines ou plus | −15 |
 | 8 | Plusieurs tirets dans le domaine principal | −15 |
-| 9 | Mots typiques des arnaques | −30 |
+| 9 | Mots typiques des arnaques | -8 par mot, max −30 |
 | 10 | Caractères d'autres alphabets ou punycode | −35 |
 | 11 | Lien raccourci | −15 |
 | 12 | Domaine récemment enregistré (moins de 30 jours / moins de 180 jours) | −15 |
@@ -30,6 +30,7 @@ Le score commence à 100 et diminue lorsque des signaux suspects sont détectés
 - **Historique de session** : chaque analyse s'ajoute à un historique personnel (10 dernières, la plus récente en premier), avec pastilles de couleur — parfait pour comparer plusieurs liens pendant une démo.
 - **Bouton « Effacer l'historique »** pour repartir à zéro.
 - **Présentation soignée** : bandeau bleu marine et accents dorés, mise en page adaptative (mobile et bureau).
+- **Interface bilingue** Français / Anglais 
 
 ## 🚀 Installation et lancement
 
@@ -37,7 +38,7 @@ Python 3 requis (`python --version` pour vérifier).
 
 ```bash
 # 1. Aller dans le dossier du projet
-cd sentinelle-pratique
+cd sentinelle-web
 
 # 2. Créer un environnement virtuel
 python -m venv .venv
@@ -88,9 +89,10 @@ sentinelle-pratique/
 
 ## 👤 Contexte
 
-Projet réalisé en vue d'**HackDécouverte 2026** (hackathon, 14 novembre 2026, Université Concordia, Montréal). La version du jour J sera reconstruite sur place avec l'équipe.
+Projet réalisé en vue d'**HackDécouverte 2026** (hackathon, 14 novembre 2026, Université Concordia, Montréal).
 
-**Auteur :** Olivier Montpetit ([@khol76](https://github.com/khol76)) — AEC Infrastructure informatique et cybersécurité, Cégep Bois-de-Boulogne.
+**Auteur :** 
+Olivier Montpetit, Walid Guetaf, Alex Jandali, Allassane Kamara
 
 ## 🔒 Limites honnêtes
 
