@@ -23,7 +23,7 @@ Mini application web en **Python + Flask** qui analyse une adresse web et lui at
 
 Le score commence à 100 et diminue lorsque des signaux suspects sont détectés. Un score élevé ne garantit pas qu'un site est légitime.
 
-**Verdicts :** 80–100 → *Probablement sur* 🟢 · 50–79 → *Prudence* 🟠 · 0–49 → *Risqué* 🔴
+**Verdicts :** 80–100 → *Probablement sûr* 🟢 · 50–79 → *Prudence* 🟠 · 0–49 → *Risqué* 🔴
 
 ## ✨ Fonctionnalités
 
@@ -61,7 +61,7 @@ Ouvrir ensuite **http://127.0.0.1:5001** dans le navigateur.
 
 | Adresse | Score | Verdict |
 |---|---|---|
-| `https://www.google.com` | 100 | Probablement sur|
+| `https://www.google.com` | 100 | Probablement sûr|
 | `https://paypa1.com` | 60 | Prudence |
 | `http://google.com@192.168.0.25` | 25 | Risqué |
 | `login.secure.update.paypa1-secure-verify.xyz/verify-colis-remboursement-urgent-connexion-securisee-1234567890` | 0 | Risqué |
