@@ -53,7 +53,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Ouvrir ensuite **http://127.0.0.1:5000** dans le navigateur.
+Ouvrir ensuite **http://127.0.0.1:5001** dans le navigateur.
 
 ## 🧪 Jeux de tests
 
