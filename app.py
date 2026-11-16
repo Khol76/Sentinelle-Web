@@ -137,6 +137,8 @@ def faute_de_frappe(domaine):
 
 def domaine_principal(hote):
     """« login.secure.paypal.com » -> « paypal.com »"""
+    if est_adresse_ip(hote):
+        return hote
     for suffixe in sorted(SUFFIXES_DOUBLES, key=len, reverse=True):
         if hote.endswith("." + suffixe):
             reste = hote[: -(len(suffixe) + 1)]
