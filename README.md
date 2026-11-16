@@ -1,6 +1,6 @@
 # 🛡️ Sentinelle Web
 
-Mini application web en **Python + Flask** qui analyse une adresse web et lui attribue un **score de risque d'hameçonnage** (0 = très risqué, 100 = aucun signal détecté), avec les raisons expliquées en langage clair.
+Mini application web en **Python + Flask** qui analyse une adresse web et lui attribue un **score de risque d'hameçonnage** (0 = très risqué, 100 = aucun signal détecté), avec les raisons expliquées en langage clair. Interface bilingue Français / Anglais.
 
 > ⚠️ L'analyse est purement textuelle : l'application ne visite jamais les liens analysés.
 
@@ -18,12 +18,12 @@ Mini application web en **Python + Flask** qui analyse une adresse web et lui at
 | 8 | Plusieurs tirets dans le domaine principal | −15 |
 | 9 | Mots typiques des arnaques | -8 par mot, max −30 |
 | 10 | Caractères d'autres alphabets ou punycode | −35 |
-| 11 | Lien raccourci | −15 |
-| 12 | Domaine récemment enregistré (moins de 30 jours / moins de 180 jours) | −15 |
+| 11 | Lien raccourci | −30 |
+| 12 | Domaine récemment enregistré (moins de 30 jours / moins de 180 jours) | −35 / -15 |
 
 Le score commence à 100 et diminue lorsque des signaux suspects sont détectés. Un score élevé ne garantit pas qu'un site est légitime.
 
-**Verdicts :** 80–100 → *Aucun signal majeur* 🟢 · 50–79 → *Prudence* 🟠 · 0–49 → *Risqué* 🔴
+**Verdicts :** 80–100 → *Probablement sur* 🟢 · 50–79 → *Prudence* 🟠 · 0–49 → *Risqué* 🔴
 
 ## ✨ Fonctionnalités
 
@@ -58,28 +58,37 @@ Ouvrir ensuite **http://127.0.0.1:5001** dans le navigateur.
 
 ## 🧪 Jeux de tests
 
-Le fichier `jeux-de-tests.md` détaille 6 adresses avec le score et le verdict attendus pour chacune :
 
 | Adresse | Score | Verdict |
 |---|---|---|
-| `https://www.google.com` | 100 | Aucun signal majeur|
-| `http://banque-legitime.com@site-pirate.ru/connexion` | 40 | Risqué |
-| `https://www.paypa1.com/connexion` | 75 | Prudence |
-| `http://desjardins-securite.com` | 45 | Risqué |
-| `https://connexion.banque.nationale.securite-verification.com/session/identifiant/client` | 60 | Prudence |
-| `https://www.paypal.com/signin` | 100 | Aucun signal majeur |
+| `https://www.google.com` | 100 | Probablement sur|
+| `https://paypa1.com` | 60 | Prudence |
+| `http://google.com@192.168.0.25` | 25 | Risqué |
+| `htlogin.secure.update.paypa1-secure-verify.xyz/verify-colis-remboursement-urgent-connexion-securisee-1234567890` | 0 | Risqué |
+| `https://bit.ly/3xYz12` | 70 | Prudence |
+| `https://xn--pple-43d.com` | 50 | Prudence |
 
 ## 🗂️ Structure du projet
 
 ```
 sentinelle-pratique/
-├── app.py               ← serveur Flask + logique d'analyse (6 règles)
-├── requirements.txt     ← dépendances (Flask)
+├── app.py                       ← serveur Flask + logique d'analyse (12 règles)
+├── chargement.py                ← chargement des listes de référence
+├── requirements.txt             ← dépendances (Flask, requests)
+├── donnees/
+│   └── extensions.txt           ← extensions souvent abusées, ex .xyz (règle 6)
+│   └── marques.json             ← marques connues et leurs domaines officiels (règle 4)
+│   └── marques_mot_entier.txt   ← marques aussi mais mots courants, mot entier seulement
+│   └── messages.json            ← testes de l'interface en Français et Anglais
+│   └── mots_suspects.txt        ← mot typiques des arnaques (règle 9) 
+│   └── raccourcisseurs.txt      ← raccourcisseurs connus, ex. bit.ly (règle 11)
+│   └── sites_confiance.txt      ← base de donnée pour sites de confiance
+│   └── suffixes.txt             ← suffixe doubles, ex. co.uk
 ├── static/
-│   └── style.css        ← feuille de style partagée (marine/or)
+│   └── style.css                ← feuille de style partagée (marine/or)
 └── templates/
-    ├── index.html       ← page du formulaire
-    └── resultat.html    ← page de résultat (score, raisons, historique)
+    ├── index.html               ← page du formulaire + resultat
+
 ```
 
 ## 🛠️ Technologies
