@@ -88,7 +88,7 @@ sentinelle-pratique/
 
 ## 👤 Contexte
 
-Projet d'entraînement réalisé en vue d'**HackDécouverte 2026** (hackathon, 14 novembre 2026, Université Concordia, Montréal). La version du jour J sera reconstruite sur place avec l'équipe.
+Projet réalisé en vue d'**HackDécouverte 2026** (hackathon, 14 novembre 2026, Université Concordia, Montréal). La version du jour J sera reconstruite sur place avec l'équipe.
 
 **Auteur :** Olivier Montpetit ([@khol76](https://github.com/khol76)) — AEC Infrastructure informatique et cybersécurité, Cégep Bois-de-Boulogne.
 
